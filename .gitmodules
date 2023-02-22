@@ -4,3 +4,9 @@
 [submodule "firmware/submodules/surf"]
 	path = firmware/submodules/surf
 	url = git@github.com:slaclab/surf
+[submodule "firmware/submodules/aes-stream-drivers"]
+	path = firmware/submodules/aes-stream-drivers
+	url = git@github.com:slaclab/aes-stream-drivers
+[submodule "firmware/submodules/axi-soc-ultra-plus-core"]
+	path = firmware/submodules/axi-soc-ultra-plus-core
+	url = git@github.com:slaclab/axi-soc-ultra-plus-core
