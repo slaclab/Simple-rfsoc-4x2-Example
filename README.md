@@ -108,7 +108,7 @@ https://xilinx-wiki.atlassian.net/wiki/x/EYMfAQ
 This typically will include system.bit, BOOT.BIN, image.ub, and boot.scr.  Here's an example:
 
 ```bash
-sudo mount /dev/sde1 /u1/boot
+sudo mount /dev/sdc1 /u1/boot
 sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/system.bit /u1/boot/.
 sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/BOOT.BIN   /u1/boot/.
 sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/image.ub   /u1/boot/.
