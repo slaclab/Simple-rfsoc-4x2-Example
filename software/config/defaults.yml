@@ -1,0 +1,22 @@
+Root:
+  XilinxZcu208:
+    Application:
+      AppRingBuffer:
+        Adc:
+          Ch[:]:
+            TrigBurst: 0x0
+            ContinuousMode: 0x1
+        Dac:
+          Ch[:]:
+            TrigBurst: 0x0
+            ContinuousMode: 0x1
+      DacSigGen:
+        enable: True
+        Enabled: 0x1
+        Continuous: 0x1
+        # CsvFilePath: 'config/DacSigGen/1tone_19_531250MHz_all_channels.csv'
+        # CsvFilePath: 'config/DacSigGen/1tone_21MHz.csv'
+        # CsvFilePath: 'config/DacSigGen/1tone_1GHz.csv'
+        # CsvFilePath: 'config/DacSigGen/2tone_1GHz_1MHzspacing.csv'
+        CsvFilePath: 'config/DacSigGen/Ntone_2GHz_blanksection.csv'
+        # CsvFilePath: 'config/DacSigGen/zero_all_ch.csv'
