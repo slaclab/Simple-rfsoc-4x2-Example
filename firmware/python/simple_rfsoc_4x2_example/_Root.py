@@ -33,6 +33,7 @@ class Root(pr.Root):
                  top_level   = '',
                  defaultFile = '',
                  lmkConfig   = 'config/lmk/HexRegisterValues.txt',
+                 lmxConfig   = 'config/lmx/HexRegisterValues.txt',
                  **kwargs):
 
         # Pass custom value to parent via super function
@@ -43,9 +44,11 @@ class Root(pr.Root):
         if self.top_level != '':
             self.defaultFile = f'{top_level}/{defaultFile}'
             self.lmkConfig   = f'{top_level}/{lmkConfig}'
+            self.lmxConfig   = f'{top_level}/{lmxConfig}'
         else:
             self.defaultFile = defaultFile
             self.lmkConfig   = lmkConfig
+            self.lmxConfig   = lmxConfig
 
         # File writer
         self.dataWriter = pr.utilities.fileio.StreamWriter()
@@ -64,7 +67,7 @@ class Root(pr.Root):
         # Add RfSoC4x2 PS hardware control
         self.add(rfsoc_hw.Hardware(
             memBase    = self.memMap,
-            expand     = True,
+            # expand     = True,
         ))
 
         # Added the RFSoC device
@@ -72,6 +75,14 @@ class Root(pr.Root):
             memBase    = self.memMap,
             offset     = 0x04_0000_0000, # Full 40-bit address space
             expand     = True,
+        ))
+
+        self.add(pr.LocalVariable(
+            name         = 'SwTimer',
+            mode         = 'RO',
+            localGet     = self.SwTimerCmd,
+            pollInterval = 1,
+            hidden       = True,
         ))
 
         ##################################################################################
@@ -103,49 +114,87 @@ class Root(pr.Root):
             # self.ringBufferDac[i] >> self.dacRateDrop[i] >> self.dacProcessor[i]
             # self.add(self.dacProcessor[i])
 
+        @self.command()
+        def LmxSet():
+            self.Hardware.Lmx[0].DataBlock.set(value=0x2410, index=0, write=True)
+            self.Hardware.Lmx[1].DataBlock.set(value=0x2410, index=0, write=True)
+            time.sleep(0.5)
+            self.Hardware.Lmx[0].DataBlock.set(value=0x2418, index=0, write=True)
+            self.Hardware.Lmx[1].DataBlock.set(value=0x2418, index=0, write=True)
+
+        @self.command()
+        def LmxGet():
+            print (hex(self.Hardware.Lmx[0].DataBlock.get(index=0, read=True) ))
+
     ##################################################################################
 
-    # def start(self,**kwargs):
-        # super(Root, self).start(**kwargs)
+    def SwTimerCmd(self):
+        # Useful pointers
+        gpio = self.Hardware.GpioPs
 
-        # # Useful pointers
-        # lmk       = self.XilinxZcu208.Hardware.Lmk
-        # i2cToSpi  = self.XilinxZcu208.Hardware.I2cToSpi
-        # dacSigGen = self.XilinxZcu208.Application.DacSigGen
-        # rfdc      = self.XilinxZcu208.RfDataConverter
+        # Rogue class alive LED strobing
+        gpio.PS_LED0_OUT.set(gpio.PS_LED0_OUT.value() ^ 0x1)
+        gpio.PS_LED1_OUT.set(gpio.PS_LED1_OUT.value() ^ 0x1)
 
-        # # Set the SPI clock rate
-        # i2cToSpi.SpiClockRate.setDisp('115kHz')
+    def start(self,**kwargs):
+        super(Root, self).start(**kwargs)
 
-        # # Configure the LMK for 4-wire SPI
-        # lmk.LmkReg_0x0000.set(value=0x10) # 4-wire SPI
-        # lmk.LmkReg_0x015F.set(value=0x3B) # STATUS_LD1 = SPI readback
+        # Useful pointers
+        lmk       = self.Hardware.Lmk
+        lmx       = [self.Hardware.Lmx[0],self.Hardware.Lmx[1]]
+        dacSigGen = self.RFSoC4x2.Application.DacSigGen
+        rfdc      = self.RFSoC4x2.RfDataConverter
 
-        # # Check for default file path
-        # if (self.defaultFile is not None) :
+        # Check for default file path
+        if (self.defaultFile is not None) :
 
-            # # Load the Default YAML file
-            # print(f'Loading path={self.defaultFile} Default Configuration File...')
-            # self.LoadConfig(self.defaultFile)
+            # Update all SW remote registers
+            self.ReadAll()
 
-            # # Load the LMK configuration from the TICS Pro software HEX export
-            # for i in range(2): # Seems like 1st time after power up that need to load twice
-                # lmk.enable.set(True)
-                # lmk.PwrDwnLmkChip()
-                # lmk.PwrUpLmkChip()
-                # lmk.LoadCodeLoaderHexFile(self.lmkConfig)
-                # lmk.Init()
-                # lmk.enable.set(False)
+            # Initialize the SPI bridge
+            self.Hardware.SpiBridge.Init()
 
-                # # Reset the RF Data Converter
-                # print(f'Resetting RF Data Converter...')
-                # rfdc.Reset.set(0x1)
-                # time.sleep(0.1)
-                # for i in range(4):
-                    # rfdc.adcTile[i].RestartSM.set(0x1)
+            # Load the Default YAML file
+            print(f'Loading path={self.defaultFile} Default Configuration File...')
+            self.LoadConfig(self.defaultFile)
+
+            # Configure the LMK for 4-wire SPI
+            lmk.LmkReg_0x0000.set(value=0x10,verify=False) # 4-wire SPI
+            lmk.LmkReg_0x014A.set(value=0x6,verify=False) # RESET/GPO as open drain
+            lmk.LmkReg_0x016E.set(value=0x3B,verify=False) # STATUS_LD2 = SPI readback
+
+            # Configure the LMX for readback
+            for i in range(2):
+                lmx[i].DataBlock.set(value=0x002410,index=0, write=True)
+
+            # Seems like 1st time after power up that need to load twice
+            for i in range(2):
+
+                # Load the LMK configuration from the TICS Pro software HEX export
+                lmk.enable.set(True)
+                lmk.PwrDwnLmkChip()
+                lmk.PwrUpLmkChip()
+                lmk.LoadCodeLoaderHexFile(self.lmkConfig)
+                lmk.Init()
+                lmk.enable.set(False)
+
+                # Load the LMX configuration from the TICS Pro software HEX export
+                for j in range(2):
+                    lmx[j].enable.set(True)
+                    lmx[j].LoadCodeLoaderHexFile(self.lmxConfig)
+                    lmx[j].enable.set(False)
+
+                # Reset the RF Data Converter
+                print(f'Resetting RF Data Converter...')
+                rfdc.Reset.set(0x1)
+                time.sleep(0.1)
+                for i in range(4):
+                    rfdc.adcTile[i].RestartSM.set(0x1)
+                    time.sleep(0.1)
                     # while rfdc.adcTile[i].pllLocked.get() != 0x1:
                         # time.sleep(0.1)
-                    # rfdc.dacTile[i].RestartSM.set(0x1)
+                    rfdc.dacTile[i].RestartSM.set(0x1)
+                    time.sleep(0.1)
                     # while rfdc.dacTile[i].pllLocked.get() != 0x1:
                         # time.sleep(0.1)
 
