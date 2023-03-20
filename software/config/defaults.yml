@@ -31,11 +31,11 @@ Root:
         Adc:
           Ch[:]:
             TrigBurst: 0x0
-            ContinuousMode: 0x1
+            ContinuousMode: 0x0
         Dac:
           Ch[:]:
             TrigBurst: 0x0
-            ContinuousMode: 0x1
+            ContinuousMode: 0x0
       DacSigGen:
         enable: True
         Enabled: 0x1

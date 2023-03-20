@@ -31,6 +31,8 @@ entity SimpleRfSoc4x2Example is
       TPD_G        : time := 1 ns;
       BUILD_INFO_G : BuildInfoType);
    port (
+      -- System Ports
+      userLed   :  out   slv(3 downto 0);
       -- RF DATA CONVERTER Ports
       adcClkP   : in    slv(1 downto 0);
       adcClkN   : in    slv(1 downto 0);
@@ -83,6 +85,11 @@ architecture top_level of SimpleRfSoc4x2Example is
    signal dspDac : Slv256Array(1 downto 0);
 
 begin
+
+   userLed(0) <= not(axilRst);
+   userLed(1) <= not(dmaRst);
+   userLed(2) <= not(dspRst);
+   userLed(3) <= '1';
 
    ------------------------------
    -- User's AXI-Lite Clock/Reset

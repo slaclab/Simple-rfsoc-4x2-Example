@@ -88,42 +88,29 @@ class Root(pr.Root):
         ##                              Data Path
         ##################################################################################
 
-        # # Create rogue stream arrays
-        # if ip != None:
-            # self.ringBufferAdc = [stream.TcpClient(ip,10000+2*(i+0))  for i in range(8)]
-            # self.ringBufferDac = [stream.TcpClient(ip,10000+2*(i+16)) for i in range(8)]
-        # else:
-            # self.ringBufferAdc = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', i,    True) for i in range(8)]
-            # self.ringBufferDac = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', 16+i, True) for i in range(8)]
-        # self.adcRateDrop   = [stream.RateDrop(True,1.0) for i in range(8)]
-        # self.dacRateDrop   = [stream.RateDrop(True,1.0) for i in range(8)]
-        # self.adcProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'AdcProcessor[{i}]',sampleRate=5.0E+9) for i in range(8)]
-        # self.dacProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'DacProcessor[{i}]',sampleRate=5.0E+9) for i in range(8)]
+        # Create rogue stream arrays
+        if ip != None:
+            self.ringBufferAdc = [stream.TcpClient(ip,10000+2*(i+0))  for i in range(4)]
+            self.ringBufferDac = [stream.TcpClient(ip,10000+2*(i+16)) for i in range(2)]
+        else:
+            self.ringBufferAdc = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', i+0,  True) for i in range(4)]
+            self.ringBufferDac = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', 16+i, True) for i in range(2)]
+        self.adcRateDrop   = [stream.RateDrop(True,1.0) for i in range(4)]
+        self.dacRateDrop   = [stream.RateDrop(True,1.0) for i in range(2)]
+        self.adcProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'AdcProcessor[{i}]',sampleRate=5.0E+9) for i in range(4)]
+        self.dacProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'DacProcessor[{i}]',sampleRate=5.0E+9) for i in range(2)]
 
-        # # Connect the rogue stream arrays
-        # for i in range(8):
+        # Connect the rogue stream arrays: ADC Ring Buffer Path
+        for i in range(4):
+            self.ringBufferAdc[i] >> self.dataWriter.getChannel(i+0)
+            self.ringBufferAdc[i] >> self.adcRateDrop[i] >> self.adcProcessor[i]
+            self.add(self.adcProcessor[i])
 
-            # # ADC Ring Buffer Path
-            # self.ringBufferAdc[i] >> self.dataWriter.getChannel(i+0)
-            # self.ringBufferAdc[i] >> self.adcRateDrop[i] >> self.adcProcessor[i]
-            # self.add(self.adcProcessor[i])
-
-            # # DAC Ring Buffer Path
-            # self.ringBufferDac[i] >> self.dataWriter.getChannel(i+16)
-            # self.ringBufferDac[i] >> self.dacRateDrop[i] >> self.dacProcessor[i]
-            # self.add(self.dacProcessor[i])
-
-        @self.command()
-        def LmxSet():
-            self.Hardware.Lmx[0].DataBlock.set(value=0x2410, index=0, write=True)
-            self.Hardware.Lmx[1].DataBlock.set(value=0x2410, index=0, write=True)
-            time.sleep(0.5)
-            self.Hardware.Lmx[0].DataBlock.set(value=0x2418, index=0, write=True)
-            self.Hardware.Lmx[1].DataBlock.set(value=0x2418, index=0, write=True)
-
-        @self.command()
-        def LmxGet():
-            print (hex(self.Hardware.Lmx[0].DataBlock.get(index=0, read=True) ))
+        # Connect the rogue stream arrays: DAC Ring Buffer Path
+        for i in range(2):
+            self.ringBufferDac[i] >> self.dataWriter.getChannel(i+16)
+            self.ringBufferDac[i] >> self.dacRateDrop[i] >> self.dacProcessor[i]
+            self.add(self.dacProcessor[i])
 
     ##################################################################################
 

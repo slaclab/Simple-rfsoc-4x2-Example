@@ -17,7 +17,6 @@ import argparse
 import importlib
 import rogue
 import axi_soc_ultra_plus_core.rfsoc_utility.pydm
-import pyrogue.pydm
 
 if __name__ == "__main__":
 
@@ -77,18 +76,12 @@ if __name__ == "__main__":
         initRead    = args.initRead,
         defaultFile = args.defaultFile,
     ) as root:
-        # axi_soc_ultra_plus_core.rfsoc_utility.pydm.runPyDM(
-            # root  = root,
-            # ui    = ui,
-            # sizeX = 800,
-            # sizeY = 800,
-            # numCh = 4,
-        # )
-
-        pyrogue.pydm.runPyDM(
-            root  = root,
-            sizeX = 800,
-            sizeY = 800,
+        axi_soc_ultra_plus_core.rfsoc_utility.pydm.runPyDM(
+            root     = root,
+            ui       = ui,
+            sizeX    = 800,
+            sizeY    = 800,
+            numAdcCh = 4,
+            numDacCh = 2,
         )
-
     #################################################################
