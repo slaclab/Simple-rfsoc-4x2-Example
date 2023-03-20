@@ -67,7 +67,6 @@ class Root(pr.Root):
         # Add RfSoC4x2 PS hardware control
         self.add(rfsoc_hw.Hardware(
             memBase    = self.memMap,
-            # expand     = True,
         ))
 
         # Added the RFSoC device
@@ -133,8 +132,8 @@ class Root(pr.Root):
         gpio = self.Hardware.GpioPs
 
         # Rogue class alive LED strobing
-        gpio.PS_LED0_OUT.set(gpio.PS_LED0_OUT.value() ^ 0x1)
-        gpio.PS_LED1_OUT.set(gpio.PS_LED1_OUT.value() ^ 0x1)
+        gpio.PS_LED0_OUT.set(gpio.PS_LED1_OUT.value())
+        gpio.PS_LED1_OUT.set(gpio.PS_LED0_OUT.value() ^ 0x1)
 
     def start(self,**kwargs):
         super(Root, self).start(**kwargs)
@@ -142,8 +141,8 @@ class Root(pr.Root):
         # Useful pointers
         lmk       = self.Hardware.Lmk
         lmx       = [self.Hardware.Lmx[0],self.Hardware.Lmx[1]]
-        dacSigGen = self.RFSoC4x2.Application.DacSigGen
         rfdc      = self.RFSoC4x2.RfDataConverter
+        dacSigGen = self.RFSoC4x2.Application.DacSigGen
 
         # Check for default file path
         if (self.defaultFile is not None) :
@@ -157,57 +156,56 @@ class Root(pr.Root):
             # Load the Default YAML file
             print(f'Loading path={self.defaultFile} Default Configuration File...')
             self.LoadConfig(self.defaultFile)
-
-            # Configure the LMK for 4-wire SPI
-            lmk.LmkReg_0x0000.set(value=0x10,verify=False) # 4-wire SPI
-            lmk.LmkReg_0x014A.set(value=0x6,verify=False) # RESET/GPO as open drain
-            lmk.LmkReg_0x016E.set(value=0x3B,verify=False) # STATUS_LD2 = SPI readback
-
-            # Configure the LMX for readback
-            for i in range(2):
-                lmx[i].DataBlock.set(value=0x002410,index=0, write=True)
+            self.ReadAll()
 
             # Seems like 1st time after power up that need to load twice
             for i in range(2):
 
-                # Load the LMK configuration from the TICS Pro software HEX export
+                # Configure the LMK for 4-wire SPI
                 lmk.enable.set(True)
+                lmk.LmkReg_0x0000.set(value=0x90,verify=False) # 4-wire SPI + RESET
+                lmk.LmkReg_0x0000.set(value=0x10,verify=False) # 4-wire SPI
+                lmk.LmkReg_0x014A.set(value=0x06,verify=False) # RESET/GPO as open drain
+                lmk.LmkReg_0x016E.set(value=0x3B,verify=False) # STATUS_LD2 = SPI readback
+
+                # Load the LMK configuration from the TICS Pro software HEX export
                 lmk.PwrDwnLmkChip()
                 lmk.PwrUpLmkChip()
                 lmk.LoadCodeLoaderHexFile(self.lmkConfig)
                 lmk.Init()
+                lmk.LmkReg_0x016E.set(value=0x13,verify=False) # STATUS_LD2 = PLL2 DLD
                 lmk.enable.set(False)
 
                 # Load the LMX configuration from the TICS Pro software HEX export
                 for j in range(2):
                     lmx[j].enable.set(True)
+                    lmx[j].DataBlock.set(value=0x002410,index=0, write=True) # MUXOUT_LD_SEL=readback
                     lmx[j].LoadCodeLoaderHexFile(self.lmxConfig)
+                    lmx[j].DataBlock.set(value=0x002414,index=0, write=True) # MUXOUT_LD_SEL=LockDetect
                     lmx[j].enable.set(False)
 
                 # Reset the RF Data Converter
                 print(f'Resetting RF Data Converter...')
                 rfdc.Reset.set(0x1)
-                time.sleep(0.1)
-                for i in range(4):
+                for i in [0,2]: # Only ADC/DAC.TILE[0] and ADC/DAC.TILE[2]
                     rfdc.adcTile[i].RestartSM.set(0x1)
-                    time.sleep(0.1)
-                    # while rfdc.adcTile[i].pllLocked.get() != 0x1:
-                        # time.sleep(0.1)
+                    while rfdc.adcTile[i].pllLocked.get() != 0x1:
+                        time.sleep(0.1)
                     rfdc.dacTile[i].RestartSM.set(0x1)
-                    time.sleep(0.1)
-                    # while rfdc.dacTile[i].pllLocked.get() != 0x1:
-                        # time.sleep(0.1)
+                    while rfdc.dacTile[i].pllLocked.get() != 0x1:
+                        time.sleep(0.1)
 
-            # # Wait for DSP Clock to be stable
-            # time.sleep(1.0)
+            # Wait for DSP Clock to be stable
+            time.sleep(1.0)
 
-            # # Load the waveform data into DacSigGen
-            # if self.top_level != '':
-                # csvFile = dacSigGen.CsvFilePath.get()
-                # dacSigGen.CsvFilePath.set(f'{self.top_level}/{csvFile}')
-            # dacSigGen.LoadCsvFile()
+            # Load the waveform data into DacSigGen
+            csvFile = dacSigGen.CsvFilePath.get()
+            if csvFile != '':
+                if self.top_level != '':
+                    dacSigGen.CsvFilePath.set(f'{self.top_level}/{csvFile}')
+                dacSigGen.LoadCsvFile()
 
-            # # Update all SW remote registers
-            # self.ReadAll()
+            # Update all SW remote registers
+            self.ReadAll()
 
     ##################################################################################
