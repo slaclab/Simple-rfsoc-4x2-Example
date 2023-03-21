@@ -18,7 +18,7 @@ $ git clone --recursive git@github.com:slaclab/Simple-rfsoc-4x2-Example
 
 # How to generate the RFSoC .BIT and .XSA files
 
-1) Setup Xilinx licensing
+1) Setup Xilinx PATH and licensing (if on SLAC AFS network) else requires Vivado install and licensing on your local machine
 
 ```bash
 $ source Simple-rfsoc-4x2-Example/firmware/vivado_setup.sh
@@ -54,12 +54,12 @@ drwxr-xr-x 2 ruckman re 2.0K Feb  4 21:15 .
 
 1) Generate the .bit and .xsa files (refer to `How to generate the RFSoC .BIT and .XSA files` instructions).
 
-2) Setup Xilinx licensing and petalinux software
+2) Setup Xilinx licensing and petalinux software (if on SLAC AFS network) else requires Xilinx & petalinux install on your local machine
 
 ```bash
 # These setup scripts assume that you are on SLAC network
 $ source Simple-rfsoc-4x2-Example/firmware/vivado_setup.sh
-$ source /u1/petalinux/2022.1/settings.sh
+$ source /path/to/petalinux/2022.2/settings.sh
 ```
 
 3) Go to the target directory and run the `CreatePetalinuxProject.sh` script with arg pointing to path of .XSA file:
@@ -125,17 +125,19 @@ ssh root@10.0.0.200 '/bin/sync; /sbin/reboot'
 
 # How to run the Rogue GUI
 
-1) Go to software directory and setup the rogue environment
+- Assumes the DHCP assigned IP address is 10.0.0.10
+
+1) Setup the rogue environment (if on SLAC AFS network) else install rogue (recommend Anaconda method) on your local machine
 
 ```bash
-$ cd Simple-rfsoc-4x2-Example/software
-$ source setup_env_slac.sh
+$ source Simple-rfsoc-4x2-Example/software/setup_env_slac.sh
 ```
 
 2) Lauch the GUI:
 
 ```bash
-$ python scripts/devGui.py
+$ cd Simple-rfsoc-4x2-Example/software
+$ python scripts/devGui.py --ip 10.0.0.10
 ```
 
 <!--- ######################################################## -->
