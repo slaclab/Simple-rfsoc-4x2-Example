@@ -80,15 +80,19 @@ https://xilinx-wiki.atlassian.net/wiki/x/EYMfAQ
 2) Copy For the boot images, simply copy the files to the FAT partition.
 This typically will include system.bit, BOOT.BIN, image.ub, and boot.scr.  Here's an example:
 
+Note: Assumes SD memory FAT32 is `/dev/sde1` in instructions below
+
 ```bash
-sudo mount /dev/sdc1 /u1/boot
-sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/system.bit /u1/boot/.
-sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/BOOT.BIN   /u1/boot/.
-sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/image.ub   /u1/boot/.
-sudo cp /u1/ruckman/build/petalinux/SimpleRfSoc4x2Example/images/linux/boot.scr   /u1/boot/.
-sudo sync /u1/boot/
-sudo umount /u1/boot
+sudo mkdir -p boot
+sudo mount /dev/sde1 boot
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/system.bit boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/BOOT.BIN   boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/image.ub   boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/boot.scr   boot/.
+sudo sync boot/
+sudo umount boot
 ```
+
 3) Power down the RFSoC board
 
 4) Confirm the Mode SW2 [4:1] = 1110 (Mode Pins [3:0]). Note: Switch OFF = 1 = High; ON = 0 = Low.
