@@ -24,8 +24,8 @@ RoguePackages:
   # - ../software/scripts/devGui
 
 Targets:
-  SimpleZcu208Example:
-    ImageDir: targets/SimpleZcu208Example/images
+  SimpleRfSoc4x2Example:
+    ImageDir: targets/SimpleRfSoc4x2Example/images
     Extensions:
       - petalinux.tar.gz
 
@@ -33,6 +33,6 @@ Releases:
   all:
     Primary: True
     Targets:
-      - SimpleZcu208Example
+      - SimpleRfSoc4x2Example
     Types:
-      - Rogue
+      - Petalinux_Only
