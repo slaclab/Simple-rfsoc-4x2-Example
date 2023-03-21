@@ -32,21 +32,21 @@ entity SimpleRfSoc4x2Example is
       BUILD_INFO_G : BuildInfoType);
    port (
       -- System Ports
-      userLed   :  out   slv(3 downto 0);
+      userLed : out slv(3 downto 0);
       -- RF DATA CONVERTER Ports
-      adcClkP   : in    slv(1 downto 0);
-      adcClkN   : in    slv(1 downto 0);
-      adcP      : in    slv(3 downto 0);
-      adcN      : in    slv(3 downto 0);
-      dacClkP   : in    slv(1 downto 0);
-      dacClkN   : in    slv(1 downto 0);
-      dacP      : out   slv(1 downto 0);
-      dacN      : out   slv(1 downto 0);
-      sysRefP   : in    sl;
-      sysRefN   : in    sl;
+      adcClkP : in  slv(1 downto 0);
+      adcClkN : in  slv(1 downto 0);
+      adcP    : in  slv(3 downto 0);
+      adcN    : in  slv(3 downto 0);
+      dacClkP : in  slv(1 downto 0);
+      dacClkN : in  slv(1 downto 0);
+      dacP    : out slv(1 downto 0);
+      dacN    : out slv(1 downto 0);
+      sysRefP : in  sl;
+      sysRefN : in  sl;
       -- SYSMON Ports
-      vPIn      : in    sl;
-      vNIn      : in    sl);
+      vPIn    : in  sl;
+      vNIn    : in  sl);
 end SimpleRfSoc4x2Example;
 
 architecture top_level of SimpleRfSoc4x2Example is
@@ -128,6 +128,9 @@ begin
          ------------------------
          --  Top Level Interfaces
          ------------------------
+         -- DSP Clock and Reset Monitoring
+         dspClk          => dspClk,
+         dspRst          => dspRst,
          -- DMA Interfaces  (dmaClk domain)
          dmaClk          => dmaClk,
          dmaRst          => dmaRst,

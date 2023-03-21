@@ -284,7 +284,14 @@ begin
    begin
       -- Help with making timing
       if rising_edge(dspClock) then
-         rfdcDac <= dspDac after TPD_G;
+         -----------------------------------------
+         -- Reserve Order to match PCB silkscreen:
+         -----------------------------------------
+         -- DAC_A = CH[0] = DAC_VOUT0_230
+         -- DAC_B = CH[1] = DAC_VOUT0_228
+         -----------------------------------------
+         rfdcDac(0) <= dspDac(1) after TPD_G;
+         rfdcDac(1) <= dspDac(0) after TPD_G;
       end if;
    end process;
 
@@ -307,8 +314,16 @@ begin
             -- Slave Interface
             slaveClk    => rfdcClk,
             slaveRst    => rfdcRst,
-            slaveData   => adc(i),
-            slaveValid  => adcValid(i),
+            -----------------------------------------
+            -- Reserve Order to match PCB silkscreen:
+            -----------------------------------------
+            -- ADC_A = CH[0] = ADC_VIN_I23_226
+            -- ADC_B = CH[1] = ADC_VIN_I01_226
+            -- ADC_C = CH[2] = ADC_VIN_I23_224
+            -- ADC_D = CH[3] = ADC_VIN_I01_224
+            -----------------------------------------
+            slaveData   => adc(3-i),
+            slaveValid  => adcValid(3-i),
             slaveReady  => open,
             -- Master Interface
             masterClk   => dspClock,

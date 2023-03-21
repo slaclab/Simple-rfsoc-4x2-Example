@@ -146,6 +146,7 @@ class Root(pr.Root):
             self.ReadAll()
 
             # Seems like 1st time after power up that need to load twice
+            print(f'Resetting RF Data Converter...')
             for i in range(2):
 
                 # Configure the LMK for 4-wire SPI
@@ -172,18 +173,18 @@ class Root(pr.Root):
                     lmx[j].enable.set(False)
 
                 # Reset the RF Data Converter
-                print(f'Resetting RF Data Converter...')
                 rfdc.Reset.set(0x1)
                 for i in [0,2]: # Only ADC/DAC.TILE[0] and ADC/DAC.TILE[2]
                     rfdc.adcTile[i].RestartSM.set(0x1)
                     while rfdc.adcTile[i].pllLocked.get() != 0x1:
-                        time.sleep(0.1)
+                        time.sleep(0.01)
                     rfdc.dacTile[i].RestartSM.set(0x1)
                     while rfdc.dacTile[i].pllLocked.get() != 0x1:
-                        time.sleep(0.1)
+                        time.sleep(0.01)
 
             # Wait for DSP Clock to be stable
-            time.sleep(1.0)
+            while(self.RFSoC4x2.AxiSocCore.AxiVersion.DspReset.get()):
+                time.sleep(0.01)
 
             # Load the waveform data into DacSigGen
             csvFile = dacSigGen.CsvFilePath.get()
