@@ -14,7 +14,7 @@ import axi_soc_ultra_plus_core  as socCore
 import surf.xilinx              as xil
 import simple_rfsoc_4x2_example as rfsoc
 
-class RFSoC4x2(pr.Device):
+class RFSoC(pr.Device):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 

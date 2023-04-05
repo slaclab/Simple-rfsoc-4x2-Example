@@ -1,30 +1,5 @@
 Root:
-  Hardware:
-    GpioPs:
-      ################
-      LMK_RST_OUT: 0x0
-      LMK_CLK_IN_SEL0_OUT: 0x1  # Local 10 MHz reference
-      # LMK_CLK_IN_SEL0_OUT: 0x0  # External 125 MHz reference
-      LMK_CLK_IN_SEL1_OUT: 0x0
-      PS_LED1_OUT: 0x0
-      PS_LED0_OUT: 0x1
-      ################
-      LMK_RST_DIR: 0x1
-      LMK_CLK_IN_SEL0_DIR: 0x1
-      LMK_CLK_IN_SEL1_DIR: 0x1
-      PS_LED1_DIR: 0x1
-      PS_LED0_DIR: 0x1
-      ################
-      LMK_RST_OEN: 0x1
-      LMK_CLK_IN_SEL0_OEN: 0x1
-      LMK_CLK_IN_SEL1_OEN: 0x1
-      PS_LED1_OEN: 0x1
-      PS_LED0_OEN: 0x1
-      ################
-    SpiBridge:
-      Regs:
-        BAUD_RATE_DIV: div256
-  RFSoC4x2:
+  RFSoC:
     enable: True
     Application:
       AppRingBuffer:

@@ -70,7 +70,7 @@ class Root(pr.Root):
         ))
 
         # Added the RFSoC device
-        self.add(rfsoc.RFSoC4x2(
+        self.add(rfsoc.RFSoC(
             memBase    = self.memMap,
             offset     = 0x04_0000_0000, # Full 40-bit address space
             expand     = True,
@@ -126,74 +126,34 @@ class Root(pr.Root):
         super(Root, self).start(**kwargs)
 
         # Useful pointers
-        lmk       = self.Hardware.Lmk
-        lmx       = [self.Hardware.Lmx[0],self.Hardware.Lmx[1]]
-        rfdc      = self.RFSoC4x2.RfDataConverter
-        dacSigGen = self.RFSoC4x2.Application.DacSigGen
+        dacSigGen = self.RFSoC.Application.DacSigGen
 
-        # Check for default file path
-        if (self.defaultFile is not None) :
+        # Update all SW remote registers
+        self.ReadAll()
 
-            # Update all SW remote registers
-            self.ReadAll()
+        # Load the Default YAML file
+        print(f'Loading path={self.defaultFile} Default Configuration File...')
+        self.LoadConfig(self.defaultFile)
+        self.ReadAll()
 
-            # Initialize the SPI bridge
-            self.Hardware.SpiBridge.Init()
+        # Initialize the LMK/LMX Clock chips
+        self.Hardware.InitClock(lmkConfig=self.lmkConfig,lmxConfig=[self.lmxConfig])
 
-            # Load the Default YAML file
-            print(f'Loading path={self.defaultFile} Default Configuration File...')
-            self.LoadConfig(self.defaultFile)
-            self.ReadAll()
+        # Wait for DSP Clock to be stable
+        while(self.RFSoC.AxiSocCore.AxiVersion.DspReset.get()):
+            time.sleep(0.01)
 
-            # Seems like 1st time after power up that need to load twice
-            print(f'Resetting RF Data Converter...')
-            for i in range(2):
+        # Initialize the RF Data Converter
+        self.RFSoC.RfDataConverter.Init(dynamicNco=True)
 
-                # Configure the LMK for 4-wire SPI
-                lmk.enable.set(True)
-                lmk.LmkReg_0x0000.set(value=0x90,verify=False) # 4-wire SPI + RESET
-                lmk.LmkReg_0x0000.set(value=0x10,verify=False) # 4-wire SPI
-                lmk.LmkReg_0x014A.set(value=0x06,verify=False) # RESET/GPO as open drain
-                lmk.LmkReg_0x016E.set(value=0x3B,verify=False) # STATUS_LD2 = SPI readback
+        # Load the waveform data into DacSigGen
+        csvFile = dacSigGen.CsvFilePath.get()
+        if csvFile != '':
+            if self.top_level != '':
+                dacSigGen.CsvFilePath.set(f'{self.top_level}/{csvFile}')
+            dacSigGen.LoadCsvFile()
 
-                # Load the LMK configuration from the TICS Pro software HEX export
-                lmk.PwrDwnLmkChip()
-                lmk.PwrUpLmkChip()
-                lmk.LoadCodeLoaderHexFile(self.lmkConfig)
-                lmk.Init()
-                lmk.LmkReg_0x016E.set(value=0x13,verify=False) # STATUS_LD2 = PLL2 DLD
-                lmk.enable.set(False)
-
-                # Load the LMX configuration from the TICS Pro software HEX export
-                for j in range(2):
-                    lmx[j].enable.set(True)
-                    lmx[j].DataBlock.set(value=0x002410,index=0, write=True) # MUXOUT_LD_SEL=readback
-                    lmx[j].LoadCodeLoaderHexFile(self.lmxConfig)
-                    lmx[j].DataBlock.set(value=0x002414,index=0, write=True) # MUXOUT_LD_SEL=LockDetect
-                    lmx[j].enable.set(False)
-
-                # Reset the RF Data Converter
-                rfdc.Reset.set(0x1)
-                for i in [0,2]: # Only ADC/DAC.TILE[0] and ADC/DAC.TILE[2]
-                    rfdc.adcTile[i].RestartSM.set(0x1)
-                    while rfdc.adcTile[i].pllLocked.get() != 0x1:
-                        time.sleep(0.01)
-                    rfdc.dacTile[i].RestartSM.set(0x1)
-                    while rfdc.dacTile[i].pllLocked.get() != 0x1:
-                        time.sleep(0.01)
-
-            # Wait for DSP Clock to be stable
-            while(self.RFSoC4x2.AxiSocCore.AxiVersion.DspReset.get()):
-                time.sleep(0.01)
-
-            # Load the waveform data into DacSigGen
-            csvFile = dacSigGen.CsvFilePath.get()
-            if csvFile != '':
-                if self.top_level != '':
-                    dacSigGen.CsvFilePath.set(f'{self.top_level}/{csvFile}')
-                dacSigGen.LoadCsvFile()
-
-            # Update all SW remote registers
-            self.ReadAll()
+        # Update all SW remote registers
+        self.ReadAll()
 
     ##################################################################################
