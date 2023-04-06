@@ -139,12 +139,12 @@ class Root(pr.Root):
         # Initialize the LMK/LMX Clock chips
         self.Hardware.InitClock(lmkConfig=self.lmkConfig,lmxConfig=[self.lmxConfig])
 
+        # Initialize the RF Data Converter
+        self.RFSoC.RfDataConverter.Init()
+
         # Wait for DSP Clock to be stable
         while(self.RFSoC.AxiSocCore.AxiVersion.DspReset.get()):
             time.sleep(0.01)
-
-        # Initialize the RF Data Converter
-        self.RFSoC.RfDataConverter.Init(dynamicNco=True)
 
         # Load the waveform data into DacSigGen
         csvFile = dacSigGen.CsvFilePath.get()
