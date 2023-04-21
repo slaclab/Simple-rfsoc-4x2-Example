@@ -152,6 +152,8 @@ class Root(pr.Root):
             if self.top_level != '':
                 dacSigGen.CsvFilePath.set(f'{self.top_level}/{csvFile}')
             dacSigGen.LoadCsvFile()
+        else:
+            self.RFSoC.Application.DacSigGenLoader.LoadSingleTones()
 
         # Update all SW remote registers
         self.ReadAll()
