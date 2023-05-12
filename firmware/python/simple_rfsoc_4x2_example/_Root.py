@@ -24,8 +24,9 @@ import pyrogue.utilities.prbs
 import simple_rfsoc_4x2_example              as rfsoc
 import axi_soc_ultra_plus_core.rfsoc_utility as rfsoc_utility
 import axi_soc_ultra_plus_core.hardware.RealDigitalRfSoC4x2 as rfsoc_hw
+import axi_soc_ultra_plus_core as soc_core
 
-rogue.Version.minVersion('5.16.0')
+rogue.Version.minVersion('5.18.4')
 
 class Root(pr.Root):
     def __init__(self,
@@ -59,6 +60,8 @@ class Root(pr.Root):
         ##################################################################################
 
         if ip != None:
+            # Check if we can ping the device and TCP socket not open
+            soc_core.connectionTest(ip)
             # Start a TCP Bridge Client, Connect remote server at 'ethReg' ports 9000 & 9001.
             self.memMap = rogue.interfaces.memory.TcpClient(ip,9000)
         else:
@@ -74,14 +77,6 @@ class Root(pr.Root):
             memBase    = self.memMap,
             offset     = 0x04_0000_0000, # Full 40-bit address space
             expand     = True,
-        ))
-
-        self.add(pr.LocalVariable(
-            name         = 'SwTimer',
-            mode         = 'RO',
-            localGet     = self.SwTimerCmd,
-            pollInterval = 1,
-            hidden       = True,
         ))
 
         ##################################################################################
@@ -113,14 +108,6 @@ class Root(pr.Root):
             self.add(self.dacProcessor[i])
 
     ##################################################################################
-
-    def SwTimerCmd(self):
-        # Useful pointers
-        gpio = self.Hardware.GpioPs
-
-        # Rogue class alive LED strobing
-        gpio.PS_LED0_OUT.set(gpio.PS_LED1_OUT.value())
-        gpio.PS_LED1_OUT.set(gpio.PS_LED0_OUT.value() ^ 0x1)
 
     def start(self,**kwargs):
         super(Root, self).start(**kwargs)
