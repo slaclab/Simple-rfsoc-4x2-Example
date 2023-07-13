@@ -77,7 +77,7 @@ if __name__ == "__main__":
         defaultFile = args.defaultFile,
     ) as root:
         axi_soc_ultra_plus_core.rfsoc_utility.pydm.runPyDM(
-            root     = root,
+            serverList = root.zmqServer.address,
             ui       = ui,
             sizeX    = 800,
             sizeY    = 800,
