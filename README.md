@@ -1,18 +1,11 @@
 # Simple-rfsoc-4x2-Example
 
-<!--- ######################################################## -->
-
-# Before you clone the GIT repository
-
-https://confluence.slac.stanford.edu/x/vJmDFg
-
-<!--- ######################################################## -->
-
 # Clone the GIT repository
 
 ```bash
-$ git clone --recursive git@github.com:slaclab/Simple-rfsoc-4x2-Example
+$ git clone --recursive https://github.com/slaclab/Simple-rfsoc-4x2-Example.git
 ```
+Note: `recursive flag` used to initialize all submodules within the clone
 
 <!--- ######################################################## -->
 
