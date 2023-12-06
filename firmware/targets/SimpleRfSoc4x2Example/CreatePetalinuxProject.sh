@@ -32,11 +32,13 @@ xsaPath=$(realpath "${1}")
 # Define the target name
 targetName=${PWD##*/}
 
+# Define the base dir
+basePath=$(realpath "$PWD/../..")
+
 # Make the build output
-mkdir -p /u1/$USER
-mkdir -p /u1/$USER/build
-mkdir -p /u1/$USER/build/petalinux
-buildPath=/u1/$USER/build/petalinux
+mkdir -p $basePath/build
+mkdir -p $basePath/build/petalinux
+buildPath=$basePath/build/petalinux
 
 # Execute the create petalinux script
 ../../submodules/axi-soc-ultra-plus-core/CreatePetalinuxProject.sh \
