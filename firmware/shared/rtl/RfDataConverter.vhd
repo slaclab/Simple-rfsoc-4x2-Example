@@ -47,14 +47,28 @@ entity RfDataConverter is
       dspClk          : out sl;
       dspRst          : out sl;
       dspAdc          : out Slv256Array(3 downto 0);
-      dspDac          : in  Slv256Array(1 downto 0);
+      dspDac          : in  Slv256Array(1 downto 0);     
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType);
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      -- ADC Real-Time Signal Interface Ports
+       -- adcClk domain
+      adcPlEvent      : in  slv(3 downto 0);
+      adcOvThresh1    : out slv(3 downto 0);
+      adcOvThresh2    : out slv(3 downto 0);
+      -- axilClk domain
+      adcClearOv      : in slv(3 downto 0);
+      adcClearOr      : in slv(3 downto 0);
+      -- async
+      adcCmOvVolt     : out slv(3 downto 0);
+      adcCmUnVolt     : out slv(3 downto 0);
+      adcDatOvfl      : out slv(3 downto 0);
+      adcOvVolt       : out slv(3 downto 0);
+      adcOvRange      : out slv(3 downto 0));
 end RfDataConverter;
 
 architecture mapping of RfDataConverter is
