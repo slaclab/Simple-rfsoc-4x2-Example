@@ -48,7 +48,21 @@ entity Application is
       axilWriteMaster : in  AxiLiteWriteMasterType;
       axilWriteSlave  : out AxiLiteWriteSlaveType;
       axilReadMaster  : in  AxiLiteReadMasterType;
-      axilReadSlave   : out AxiLiteReadSlaveType);
+      axilReadSlave   : out AxiLiteReadSlaveType;
+      -- ADC Real-Time Signal Interface Ports
+       -- adcClk domain
+      adcPlEvent      : out  slv(3 downto 0);
+      adcOvThresh1    : in slv(3 downto 0);
+      adcOvThresh2    : in slv(3 downto 0);
+      -- axilClk domain
+      adcClearOv      : out slv(3 downto 0);
+      adcClearOr      : out slv(3 downto 0);
+      -- async
+      adcCmOvVolt     : in slv(3 downto 0);
+      adcCmUnVolt     : in slv(3 downto 0);
+      adcDatOvfl      : in slv(3 downto 0);
+      adcOvVolt       : in slv(3 downto 0);
+      adcOvRange      : in slv(3 downto 0));
 end Application;
 
 architecture mapping of Application is
