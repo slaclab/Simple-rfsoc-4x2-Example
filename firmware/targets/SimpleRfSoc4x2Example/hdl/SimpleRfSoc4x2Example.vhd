@@ -227,7 +227,6 @@ begin
          adcDatOvfl      => adcDatOvfl,
          adcOvVolt       => adcOvVolt,
          adcOvRange      => adcOvRange);
-         
 
    --------------
    -- Application
