@@ -79,10 +79,21 @@ architecture top_level of SimpleRfSoc4x2Example is
    signal axilWriteMasters : AxiLiteWriteMasterArray(NUM_AXIL_MASTERS_C-1 downto 0);
    signal axilWriteSlaves  : AxiLiteWriteSlaveArray(NUM_AXIL_MASTERS_C-1 downto 0) := (others => AXI_LITE_WRITE_SLAVE_EMPTY_DECERR_C);
 
-   signal dspClk : sl;
-   signal dspRst : sl;
-   signal dspAdc : Slv256Array(3 downto 0);
-   signal dspDac : Slv256Array(1 downto 0);
+   signal dspClk           : sl;
+   signal dspRst           : sl;
+   signal dspAdc           : Slv256Array(3 downto 0);
+   signal dspDac           : Slv256Array(1 downto 0);
+
+   signal adcPlEvent       : slv(3 downto 0);
+   signal adcOvThresh1     : slv(3 downto 0);
+   signal adcOvThresh2     : slv(3 downto 0);
+   signal adcClearOv       : slv(3 downto 0);
+   signal adcClearOr       : slv(3 downto 0);
+   signal adcCmOvVolt      : slv(3 downto 0);
+   signal adcCmUnVolt      : slv(3 downto 0);
+   signal adcDatOvfl       : slv(3 downto 0);
+   signal adcOvVolt        : slv(3 downto 0);
+   signal adcOvRange       : slv(3 downto 0);
 
 begin
 
