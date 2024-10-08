@@ -212,7 +212,22 @@ begin
          axilWriteMaster => axilWriteMasters(RFDC_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(RFDC_INDEX_C),
          axilReadMaster  => axilReadMasters(RFDC_INDEX_C),
-         axilReadSlave   => axilReadSlaves(RFDC_INDEX_C));
+         axilReadSlave   => axilReadSlaves(RFDC_INDEX_C),
+         -- ADC Real-Time Signal Interface Ports
+         -- adcClk domain
+         adcPlEvent      => adcPlEvent,
+         adcOvThresh1    => adcOvThresh1,
+         adcOvThresh2    => adcOvThresh2,
+         -- axilClk domain
+         adcClearOv      => adcClearOv,
+         adcClearOr      => adcClearOr,
+         -- async
+         adcCmOvVolt     => adcCmOvVolt,
+         adcCmUnVolt     => adcCmUnVolt,
+         adcDatOvfl      => adcDatOvfl,
+         adcOvVolt       => adcOvVolt,
+         adcOvRange      => adcOvRange);
+         
 
    --------------
    -- Application
