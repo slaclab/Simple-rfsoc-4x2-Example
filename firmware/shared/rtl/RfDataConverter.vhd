@@ -47,7 +47,7 @@ entity RfDataConverter is
       dspClk          : out sl;
       dspRst          : out sl;
       dspAdc          : out Slv256Array(3 downto 0);
-      dspDac          : in  Slv256Array(1 downto 0);     
+      dspDac          : in  Slv256Array(1 downto 0);
       -- AXI-Lite Interface (axilClk domain)
       axilClk         : in  sl;
       axilRst         : in  sl;
@@ -281,6 +281,50 @@ begin
          m22_axis_tdata  => rfdcAdc(3),
          m22_axis_tvalid => rfdcValid(3),
          m22_axis_tready => '1',
+         -- ADC Tile 0, Converters [1:0] Real-Time Interface
+         adc00_pl_event  => adcPlEvent(0),
+         adc00_datapath_overflow => adcDatOvfl(0),
+         adc0_01_over_voltage => adcOvVolt(0),
+         adc0_01_clear_ov => adcClearOv(0),
+         adc0_01_clear_or => adcClearOr(0),
+         adc0_01_over_range => adcOvRange(0),
+         adc0_01_over_threshold1 => adcOvThresh1(0),
+         adc0_01_over_threshold2 => adcOvThresh2(0),
+         adc0_01_cm_over_voltage => adcCmOvVolt(0),
+         adc0_01_cm_under_voltage => adcCmUnVolt(0),
+         -- ADC Tile 1, Converters [3:2] Real-Time Interface
+         adc02_pl_event  => adcPlEvent(1),
+         adc02_datapath_overflow => adcDatOvfl(1),
+         adc0_23_over_voltage => adcOvVolt(1),
+         adc0_23_clear_ov => adcClearOv(1),
+         adc0_23_clear_or => adcClearOr(1),
+         adc0_23_over_range => adcOvRange(1),
+         adc0_23_over_threshold1 => adcOvThresh1(1),
+         adc0_23_over_threshold2 => adcOvThresh2(1),
+         adc0_23_cm_over_voltage => adcCmOvVolt(1),
+         adc0_23_cm_under_voltage => adcCmUnVolt(1),
+         -- ADC Tile 2, Converters [1:0] Real-Time Interface
+         adc20_pl_event  => adcPlEvent(2),
+         adc20_datapath_overflow => adcDatOvfl(2),
+         adc2_01_over_voltage => adcOvVolt(2),
+         adc2_01_clear_ov => adcClearOv(2),
+         adc2_01_clear_or => adcClearOr(2),
+         adc2_01_over_range => adcOvRange(2),
+         adc2_01_over_threshold1 => adcOvThresh1(2),
+         adc2_01_over_threshold2 => adcOvThresh2(2),
+         adc2_01_cm_over_voltage => adcCmOvVolt(2),
+         adc2_01_cm_under_voltage => adcCmUnVolt(2),
+         -- ADC Tile 3, Converters [3:2] Real-Time Interface
+         adc22_pl_event  => adcPlEvent(3),
+         adc22_datapath_overflow => adcDatOvfl(3),
+         adc2_23_over_voltage => adcOvVolt(3),
+         adc2_23_clear_ov => adcClearOv(3),
+         adc2_23_clear_or => adcClearOr(3),
+         adc2_23_over_range => adcOvRange(3),
+         adc2_23_over_threshold1 => adcOvThresh1(3),
+         adc2_23_over_threshold2 => adcOvThresh2(3),
+         adc2_23_cm_over_voltage => adcCmOvVolt(3),
+         adc2_23_cm_under_voltage => adcCmUnVolt(3),            
          -- DAC[0] AXI Stream Interface
          s0_axis_aresetn => dspResetL,
          s0_axis_aclk    => dspClock,
