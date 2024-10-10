@@ -59,7 +59,8 @@ architecture mapping of Application is
 
    constant RING_INDEX_C       : natural := 0;
    constant DAC_SIG_INDEX_C    : natural := 1;
-   constant NUM_AXIL_MASTERS_C : natural := 2;
+   constant GPIO_INDEX_C       : natural := 2;
+   constant NUM_AXIL_MASTERS_C : natural := 3;
 
    constant AXIL_CONFIG_C : AxiLiteCrossbarMasterConfigArray(NUM_AXIL_MASTERS_C-1 downto 0) := genAxiLiteConfig(NUM_AXIL_MASTERS_C, AXIL_BASE_ADDR_G, 28, 24);
 
@@ -161,4 +162,22 @@ begin
          axilWriteMaster => axilWriteMasters(DAC_SIG_INDEX_C),
          axilWriteSlave  => axilWriteSlaves(DAC_SIG_INDEX_C));
 
+   U_MyGpioModule : entity work.MyGpioModule
+      generic map (
+         TPD_G      => TPD_G)
+      port map (
+         -- GPIO signals
+         clrA            => clrA,
+         clrB        　  => clrB,
+         statusA     　  => statusA,
+         statusB     　  => statusB,
+         statusC     　  => statusC,
+         -- AXI-Lite Interface (axilClk domain)
+         axilClk         => axilClk,
+         axilRst         => axilRst,
+         axilReadMaster  => axilReadMasters(GPIO_INDEX_C),
+         axilReadSlave   => axilReadSlaves(GPIO_INDEX_C),
+         axilWriteMaster => axilWriteMasters(GPIO_INDEX_C),
+         axilWriteSlave  => axilWriteSlaves(GPIO_INDEX_C));
+      
 end mapping;
