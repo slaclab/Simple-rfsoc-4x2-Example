@@ -2,7 +2,7 @@
 target: bit
 
 # Define target part
-export PRJ_PART = xczu48dr-ffvg1517-1-e
+export PRJ_PART = xczu48dr-ffvg1517-2-e
 
 # Define TOP directory
 export TOP_DIR = $(abspath $(PWD)/../..)
