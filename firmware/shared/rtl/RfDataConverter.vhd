@@ -27,6 +27,9 @@ use work.AppPkg.all;
 library axi_soc_ultra_plus_core;
 use axi_soc_ultra_plus_core.AxiSocUltraPlusPkg.all;
 
+library unisim;
+use unisim.vcomponents.all;
+
 entity RfDataConverter is
    generic (
       TPD_G            : time := 1 ns;
@@ -35,14 +38,18 @@ entity RfDataConverter is
       -- RF DATA CONVERTER Ports
       adcClkP         : in  slv(1 downto 0);
       adcClkN         : in  slv(1 downto 0);
-      adcP            : in  slv(3 downto 0);
-      adcN            : in  slv(3 downto 0);
+      adcP            : in  slv(7 downto 0);
+      adcN            : in  slv(7 downto 0);
       dacClkP         : in  slv(1 downto 0);
       dacClkN         : in  slv(1 downto 0);
-      dacP            : out slv(1 downto 0);
-      dacN            : out slv(1 downto 0);
+      dacP            : out slv(7 downto 0);
+      dacN            : out slv(7 downto 0);
       sysRefP         : in  sl;
       sysRefN         : in  sl;
+      plClkP          : in  sl;
+      plClkN          : in  sl;
+      plSysRefP       : in  sl;
+      plSysRefN       : in  sl;
       -- ADC/DAC Interface (dspClk domain)
       dspClk          : out sl;
       dspRst          : out sl;
@@ -61,18 +68,18 @@ architecture mapping of RfDataConverter is
 
    component RfDataConverterIpCore
       port (
-         adc0_clk_p      : in  std_logic;
-         adc0_clk_n      : in  std_logic;
          clk_adc0        : out std_logic;
+         clk_adc1        : out std_logic;
          adc2_clk_p      : in  std_logic;
          adc2_clk_n      : in  std_logic;
          clk_adc2        : out std_logic;
-         dac0_clk_p      : in  std_logic;
-         dac0_clk_n      : in  std_logic;
+         clk_adc3        : out std_logic;
          clk_dac0        : out std_logic;
+         clk_dac1        : out std_logic;
          dac2_clk_p      : in  std_logic;
          dac2_clk_n      : in  std_logic;
          clk_dac2        : out std_logic;
+         clk_dac3        : out std_logic;
          s_axi_aclk      : in  std_logic;
          s_axi_aresetn   : in  std_logic;
          s_axi_awaddr    : in  std_logic_vector(17 downto 0);
@@ -95,18 +102,28 @@ architecture mapping of RfDataConverter is
          irq             : out std_logic;
          sysref_in_p     : in  std_logic;
          sysref_in_n     : in  std_logic;
+         user_sysref_adc : in  std_logic;
+         user_sysref_dac : in  std_logic;
          vin0_01_p       : in  std_logic;
          vin0_01_n       : in  std_logic;
          vin0_23_p       : in  std_logic;
          vin0_23_n       : in  std_logic;
+         vin1_01_p       : in  std_logic;
+         vin1_01_n       : in  std_logic;
          vin2_01_p       : in  std_logic;
          vin2_01_n       : in  std_logic;
          vin2_23_p       : in  std_logic;
          vin2_23_n       : in  std_logic;
+         vin3_01_p       : in  std_logic;
+         vin3_01_n       : in  std_logic;
          vout00_p        : out std_logic;
          vout00_n        : out std_logic;
+         vout10_p        : out std_logic;
+         vout10_n        : out std_logic;
          vout20_p        : out std_logic;
          vout20_n        : out std_logic;
+         vout30_p        : out std_logic;
+         vout30_n        : out std_logic;
          m0_axis_aresetn : in  std_logic;
          m0_axis_aclk    : in  std_logic;
          m00_axis_tdata  : out std_logic_vector(191 downto 0);
@@ -115,6 +132,11 @@ architecture mapping of RfDataConverter is
          m02_axis_tdata  : out std_logic_vector(191 downto 0);
          m02_axis_tvalid : out std_logic;
          m02_axis_tready : in  std_logic;
+         m1_axis_aresetn : in  std_logic;
+         m1_axis_aclk    : in  std_logic;
+         m10_axis_tdata  : out std_logic_vector(191 downto 0);
+         m10_axis_tvalid : out std_logic;
+         m10_axis_tready : in  std_logic;
          m2_axis_aresetn : in  std_logic;
          m2_axis_aclk    : in  std_logic;
          m20_axis_tdata  : out std_logic_vector(191 downto 0);
@@ -123,54 +145,87 @@ architecture mapping of RfDataConverter is
          m22_axis_tdata  : out std_logic_vector(191 downto 0);
          m22_axis_tvalid : out std_logic;
          m22_axis_tready : in  std_logic;
+         m3_axis_aresetn : in  std_logic;
+         m3_axis_aclk    : in  std_logic;
+         m30_axis_tdata  : out std_logic_vector(191 downto 0);
+         m30_axis_tvalid : out std_logic;
+         m30_axis_tready : in  std_logic;
          s0_axis_aresetn : in  std_logic;
          s0_axis_aclk    : in  std_logic;
          s00_axis_tdata  : in  std_logic_vector(255 downto 0);
          s00_axis_tvalid : in  std_logic;
          s00_axis_tready : out std_logic;
+         s1_axis_aresetn : in  std_logic;
+         s1_axis_aclk    : in  std_logic;
+         s10_axis_tdata  : in  std_logic_vector(255 downto 0);
+         s10_axis_tvalid : in  std_logic;
+         s10_axis_tready : out std_logic;
          s2_axis_aresetn : in  std_logic;
          s2_axis_aclk    : in  std_logic;
          s20_axis_tdata  : in  std_logic_vector(255 downto 0);
          s20_axis_tvalid : in  std_logic;
-         s20_axis_tready : out std_logic
+         s20_axis_tready : out std_logic;
+         s3_axis_aresetn : in  std_logic;
+         s3_axis_aclk    : in  std_logic;
+         s30_axis_tdata  : in  std_logic_vector(255 downto 0);
+         s30_axis_tvalid : in  std_logic;
+         s30_axis_tready : out std_logic
          );
    end component;
-
-   signal rfdcAdc   : Slv192Array(3 downto 0) := (others => (others => '0'));
-   signal rfdcValid : slv(3 downto 0)         := (others => '0');
-   signal rfdcDac   : Slv256Array(1 downto 0) := (others => (others => '0'));
-
-   signal adc      : Slv192Array(3 downto 0) := (others => (others => '0'));
-   signal adcValid : slv(3 downto 0)         := (others => '0');
 
    signal refClk   : sl := '0';
    signal axilRstL : sl := '0';
 
-   signal rfdcClk  : sl := '0';
-   signal rfdcRst  : sl := '1';
-   signal rfdcRstL : sl := '0';
+   signal adcRaw  : Slv192Array(3 downto 0) := (others => (others => '0'));
+   signal adcData : Slv192Array(3 downto 0) := (others => (others => '0'));
+
+   signal adcClock  : sl := '0';
+   signal adcReset  : sl := '1';
+   signal adcResetL : sl := '0';
+
+   signal dacClock  : sl := '0';
+   signal dacReset  : sl := '1';
+   signal dacResetL : sl := '0';
 
    signal dspClock  : sl := '0';
    signal dspReset  : sl := '1';
    signal dspResetL : sl := '0';
 
+   signal plSysRefRaw : sl := '0';
+   signal adcSysRef   : sl := '0';
+   signal dacSysRef   : sl := '0';
+
 begin
+
+   U_plSysRefRaw : IBUFDS
+      port map (
+         I  => plSysRefP,
+         IB => plSysRefN,
+         O  => plSysRefRaw);
+
+   U_adcSysRef : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => adcClock,
+         dataIn  => plSysRefRaw,
+         dataOut => adcSysRef);
+
+   U_dacSysRef : entity surf.Synchronizer
+      generic map (
+         TPD_G => TPD_G)
+      port map (
+         clk     => dacClock,
+         dataIn  => plSysRefRaw,
+         dataOut => dacSysRef);
 
    U_IpCore : RfDataConverterIpCore
       port map (
          -- Clock Ports
-         adc0_clk_p      => adcClkP(0),
-         adc0_clk_n      => adcClkN(0),
          adc2_clk_p      => adcClkP(1),
          adc2_clk_n      => adcClkN(1),
-         clk_adc0        => refClk,
-         clk_adc2        => open,
-         dac0_clk_p      => dacClkP(0),
-         dac0_clk_n      => dacClkN(0),
          dac2_clk_p      => dacClkP(1),
          dac2_clk_n      => dacClkN(1),
-         clk_dac0        => open,
-         clk_dac2        => open,
          -- AXI-Lite Ports
          s_axi_aclk      => axilClk,
          s_axi_aresetn   => axilRstL,
@@ -192,65 +247,118 @@ begin
          s_axi_rvalid    => axilReadSlave.rvalid,
          s_axi_rready    => axilReadMaster.rready,
          -- Misc. Ports
-         irq             => open,
          sysref_in_p     => sysRefP,
          sysref_in_n     => sysRefN,
+         user_sysref_adc => adcSysRef,
+         user_sysref_dac => dacSysRef,
          -- ADC Ports
          vin0_01_p       => adcP(0),
          vin0_01_n       => adcN(0),
          vin0_23_p       => adcP(1),
          vin0_23_n       => adcN(1),
-         vin2_01_p       => adcP(2),
-         vin2_01_n       => adcN(2),
-         vin2_23_p       => adcP(3),
-         vin2_23_n       => adcN(3),
+         vin1_01_p       => adcP(2),
+         vin1_01_n       => adcN(2),
+         vin2_01_p       => adcP(4),
+         vin2_01_n       => adcN(4),
+         vin2_23_p       => adcP(5),
+         vin2_23_n       => adcN(5),
+         vin3_01_p       => adcP(6),
+         vin3_01_n       => adcN(6),
          -- DAC Ports
          vout00_p        => dacP(0),
          vout00_n        => dacN(0),
-         vout20_p        => dacP(1),
-         vout20_n        => dacN(1),
-         -- ADC[1:0] AXI Stream Interface
-         m0_axis_aresetn => rfdcRstL,
-         m0_axis_aclk    => rfdcClk,
-         m00_axis_tdata  => rfdcAdc(0),
-         m00_axis_tvalid => rfdcValid(0),
+         vout10_p        => dacP(1),
+         vout10_n        => dacN(1),
+         vout20_p        => dacP(2),
+         vout20_n        => dacN(2),
+         vout30_p        => dacP(3),
+         vout30_n        => dacN(3),
+         -----------------------------------------
+         -- Reserve Order to match PCB silkscreen:
+         -----------------------------------------
+         -- ADC_A = CH[0] = ADC_VIN_I23_226
+         -- ADC_B = CH[1] = ADC_VIN_I01_226
+         -- ADC_C = CH[2] = ADC_VIN_I23_224
+         -- ADC_D = CH[3] = ADC_VIN_I01_224
+         -----------------------------------------
+         m0_axis_aresetn => adcResetL,
+         m0_axis_aclk    => adcClock,
+         m00_axis_tdata  => adcRaw(3),
+         m00_axis_tvalid => open,
          m00_axis_tready => '1',
-         m02_axis_tdata  => rfdcAdc(1),
-         m02_axis_tvalid => rfdcValid(1),
+         m02_axis_tdata  => adcRaw(2),
+         m02_axis_tvalid => open,
          m02_axis_tready => '1',
-         -- ADC[3:2] AXI Stream Interface
-         m2_axis_aresetn => rfdcRstL,
-         m2_axis_aclk    => rfdcClk,
-         m20_axis_tdata  => rfdcAdc(2),
-         m20_axis_tvalid => rfdcValid(2),
+         -- Unused TILE but needed for CLK source from TILE228 distribution (ADC_VIN_TILE225)
+         m1_axis_aresetn => adcResetL,
+         m1_axis_aclk    => adcClock,
+         m10_axis_tdata  => open,
+         m10_axis_tvalid => open,
+         m10_axis_tready => '1',
+         -- ADC[3:2] AXI Stream Interface (ADC_VIN_TILE226)
+         m2_axis_aresetn => adcResetL,
+         m2_axis_aclk    => adcClock,
+         m20_axis_tdata  => adcRaw(1),
+         m20_axis_tvalid => open,
          m20_axis_tready => '1',
-         m22_axis_tdata  => rfdcAdc(3),
-         m22_axis_tvalid => rfdcValid(3),
+         m22_axis_tdata  => adcRaw(0),
+         m22_axis_tvalid => open,
          m22_axis_tready => '1',
-         -- DAC[0] AXI Stream Interface
-         s0_axis_aresetn => dspResetL,
-         s0_axis_aclk    => dspClock,
-         s00_axis_tdata  => rfdcDac(0),
+         -- Unused TILE but needed for CLK source from TILE228 distribution (ADC_VIN_TILE227)
+         m3_axis_aresetn => adcResetL,
+         m3_axis_aclk    => adcClock,
+         m30_axis_tdata  => open,
+         m30_axis_tvalid => open,
+         m30_axis_tready => '1',
+         -----------------------------------------
+         -- Reserve Order to match PCB silkscreen:
+         -----------------------------------------
+         -- DAC_A = CH[0] = DAC_VOUT0_230
+         -- DAC_B = CH[1] = DAC_VOUT0_228
+         -----------------------------------------
+         -- DAC[0] AXI Stream Interface (DAC_VOUT_TILE228)
+         s0_axis_aresetn => dacResetL,
+         s0_axis_aclk    => dacClock,
+         s00_axis_tdata  => dspDac(1),
          s00_axis_tvalid => '1',
          s00_axis_tready => open,
-         -- DAC[1] AXI Stream Interface
-         s2_axis_aresetn => dspResetL,
-         s2_axis_aclk    => dspClock,
-         s20_axis_tdata  => rfdcDac(1),
+         -- Unused TILE but needed for CLK source from TILE228 distribution
+         s1_axis_aresetn => dacResetL,
+         s1_axis_aclk    => dacClock,
+         s10_axis_tdata  => (others => '0'),
+         s10_axis_tvalid => '1',
+         s10_axis_tready => open,
+         -- DAC[1] AXI Stream Interface  (DAC_VOUT_TILE230)
+         s2_axis_aresetn => dacResetL,
+         s2_axis_aclk    => dacClock,
+         s20_axis_tdata  => dspDac(0),
          s20_axis_tvalid => '1',
-         s20_axis_tready => open);
+         s20_axis_tready => open,
+         -- Unused TILE but needed for CLK source from TILE231 distribution
+         s3_axis_aresetn => dacResetL,
+         s3_axis_aclk    => dacClock,
+         s30_axis_tdata  => (others => '0'),
+         s30_axis_tvalid => '1',
+         s30_axis_tready => open);
+
+   U_IBUFDS : IBUFDS
+      port map(
+         I  => plClkP,
+         IB => plClkN,
+         O  => refClk);
 
    U_Pll : entity surf.ClockManagerUltraScale
       generic map(
          TPD_G             => TPD_G,
          TYPE_G            => "PLL",
-         INPUT_BUFG_G      => false,
+         INPUT_BUFG_G      => true,
          FB_BUFG_G         => true,
          RST_IN_POLARITY_G => '1',
          NUM_CLOCKS_G      => 2,
          -- MMCM attributes
-         CLKIN_PERIOD_G    => 3.2,      -- 312.5 MHz
-         CLKFBOUT_MULT_G   => 4,        -- 1.25 GHz = 4 x 312.5 MHz
+         CLKIN_PERIOD_G    => 2.0,      -- 500 MHz
+         DIVCLK_DIVIDE_G   => 2,
+         CLKFBOUT_MULT_G   => 5,        -- 1.25 GHz = 5 x 500 MHz /2
          CLKOUT0_DIVIDE_G  => 3,        -- 416.667 MHz = 1.25GHz/3
          CLKOUT1_DIVIDE_G  => 4)        -- 312.5 MHz = 1.25GHz/4
       port map(
@@ -258,80 +366,47 @@ begin
          clkIn     => refClk,
          rstIn     => axilRst,
          -- Clock Outputs
-         clkOut(0) => rfdcClk,
+         clkOut(0) => adcClock,
          clkOut(1) => dspClock,
          -- Reset Outputs
-         rstOut(0) => rfdcRst,
+         rstOut(0) => adcReset,
          rstOut(1) => dspReset);
 
    axilRstL  <= not(axilRst);
-   rfdcRstL  <= not(rfdcRst);
+   adcResetL <= not(adcReset);
+   dacResetL <= not(dacReset);
    dspResetL <= not(dspReset);
 
    dspClk <= dspClock;
    dspRst <= dspReset;
 
-   process(rfdcClk)
-   begin
-      -- Help with making timing
-      if rising_edge(rfdcClk) then
-         adc      <= rfdcAdc   after TPD_G;
-         adcValid <= rfdcValid after TPD_G;
-      end if;
-   end process;
+   dacClock <= dspClock;
+   dacReset <= dspReset;
 
-   process(dspClock)
-   begin
-      -- Help with making timing
-      if rising_edge(dspClock) then
-         -----------------------------------------
-         -- Reserve Order to match PCB silkscreen:
-         -----------------------------------------
-         -- DAC_A = CH[0] = DAC_VOUT0_230
-         -- DAC_B = CH[1] = DAC_VOUT0_228
-         -----------------------------------------
-         rfdcDac(0) <= dspDac(1) after TPD_G;
-         rfdcDac(1) <= dspDac(0) after TPD_G;
-      end if;
-   end process;
+   ----------------------------------------------------------------
+   -- Correct for a _P/_N swap on the RFSoC 4x2 hardware on TILE224
+   ----------------------------------------------------------------
+   -- ADC_A = CH[0] = ADC_VIN_I23_226
+   -- ADC_B = CH[1] = ADC_VIN_I01_226
+   -- ADC_C = CH[2] = ADC_VIN_I23_224 (swapped in HW)
+   -- ADC_D = CH[3] = ADC_VIN_I01_224 (swapped in HW)
+   ----------------------------------------------------------------
+   adcData(0) <= adcRaw(0);
+   adcData(1) <= adcRaw(1);
+   adcData(2) <= not adcRaw(2);
+   adcData(3) <= not adcRaw(3);
 
-   GEN_VEC :
-   for i in 3 downto 0 generate
-
-      --------------
-      -- ADC Gearbox
-      --------------
-      U_Gearbox_ADC : entity surf.AsyncGearbox
-         generic map (
-            TPD_G              => TPD_G,
-            SLAVE_WIDTH_G      => 192,
-            MASTER_WIDTH_G     => 256,
-            EN_EXT_CTRL_G      => false,
-            -- Async FIFO generics
-            FIFO_MEMORY_TYPE_G => "block",
-            FIFO_ADDR_WIDTH_G  => 8)
-         port map (
-            -- Slave Interface
-            slaveClk    => rfdcClk,
-            slaveRst    => rfdcRst,
-            -----------------------------------------
-            -- Reserve Order to match PCB silkscreen:
-            -----------------------------------------
-            -- ADC_A = CH[0] = ADC_VIN_I23_226
-            -- ADC_B = CH[1] = ADC_VIN_I01_226
-            -- ADC_C = CH[2] = ADC_VIN_I23_224
-            -- ADC_D = CH[3] = ADC_VIN_I01_224
-            -----------------------------------------
-            slaveData   => adc(3-i),
-            slaveValid  => adcValid(3-i),
-            slaveReady  => open,
-            -- Master Interface
-            masterClk   => dspClock,
-            masterRst   => dspReset,
-            masterData  => dspAdc(i),
-            masterValid => open,
-            masterReady => '1');
-
-   end generate GEN_VEC;
+   U_Gearbox : entity axi_soc_ultra_plus_core.Ssr12ToSsr16Gearbox
+      generic map (
+         TPD_G    => TPD_G,
+         NUM_CH_G => 4)
+      port map (
+         -- Slave Interface
+         wrClk  => adcClock,
+         wrData => adcData,
+         -- Master Interface
+         rdClk  => dspClock,
+         rdRst  => dspReset,
+         rdData => dspAdc);
 
 end mapping;

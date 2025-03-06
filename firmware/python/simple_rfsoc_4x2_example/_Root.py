@@ -26,7 +26,7 @@ import axi_soc_ultra_plus_core.rfsoc_utility as rfsoc_utility
 import axi_soc_ultra_plus_core.hardware.RealDigitalRfSoC4x2 as rfsoc_hw
 import axi_soc_ultra_plus_core as soc_core
 
-rogue.Version.minVersion('6.0.0')
+rogue.Version.minVersion('6.5.0')
 
 class Root(pr.Root):
     def __init__(self,
@@ -85,6 +85,15 @@ class Root(pr.Root):
             expand     = True,
         ))
 
+        # Add the RFDC API interface to the RFSoC PS
+        self.memRfdc = rogue.interfaces.memory.TcpClient(ip,9002)
+        self.add(rfsoc_utility.Rfdc(
+            memBase   = self.memRfdc,
+            enAdcTile = [True,False,True,False],
+            enDacTile = [True,False,True,False],
+            expand    = True,
+        ))
+
         ##################################################################################
         ##                              Data Path
         ##################################################################################
@@ -121,23 +130,35 @@ class Root(pr.Root):
         # Useful pointers
         dacSigGen = self.RFSoC.Application.DacSigGen
 
-        # Update all SW remote registers
+        print('Issuing a reset to the user logic')
+        self.RFSoC.AxiSocCore.UserRst()
+
+        # Initialize the LMK/LMX Clock chips
+        self.Hardware.InitClock(lmkConfig=self.lmkConfig,lmxConfig=[self.lmxConfig])
+
+        print('Wait for DSP Clock to be stable')
+        self.RFSoC.AxiSocCore.DspRstWait()
+
+        # Enable application after LMK/LMX has been configured
+        self.RFSoC.Application.enable.set(True)
         self.ReadAll()
+
+        # Initialize the RF Data Converter
+        self.Rfdc.Init()
+
+        # MTS Sync the RF Data Converter
+        self.Rfdc.Mst.AdcTiles.set(0x5)
+        self.Rfdc.Mst.DacTiles.set(0x5)
+        self.Rfdc.Mst.AdcRefTile.set(0x2)
+        self.Rfdc.Mst.DacRefTile.set(0x2)
+        self.Rfdc.Mst.SysRefConfig.set(1)
+        # self.Rfdc.Mst.SyncAdcTiles()
+        # self.Rfdc.Mst.SyncDacTiles()
 
         # Load the Default YAML file
         print(f'Loading path={self.defaultFile} Default Configuration File...')
         self.LoadConfig(self.defaultFile)
         self.ReadAll()
-
-        # Initialize the LMK/LMX Clock chips
-        self.Hardware.InitClock(lmkConfig=self.lmkConfig,lmxConfig=[self.lmxConfig])
-
-        # Initialize the RF Data Converter
-        self.RFSoC.RfDataConverter.Init()
-
-        # Wait for DSP Clock to be stable
-        while(self.RFSoC.AxiSocCore.AxiVersion.DspReset.get()):
-            time.sleep(0.01)
 
         # Load the waveform data into DacSigGen
         csvFile = dacSigGen.CsvFilePath.get()
@@ -147,8 +168,5 @@ class Root(pr.Root):
             dacSigGen.LoadCsvFile()
         else:
             self.RFSoC.Application.DacSigGenLoader.LoadSingleTones()
-
-        # Update all SW remote registers
-        self.ReadAll()
 
     ##################################################################################

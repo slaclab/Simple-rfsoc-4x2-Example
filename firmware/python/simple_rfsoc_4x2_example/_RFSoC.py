@@ -11,7 +11,6 @@
 import pyrogue as pr
 
 import axi_soc_ultra_plus_core  as socCore
-import surf.xilinx              as xil
 import simple_rfsoc_4x2_example as rfsoc
 
 class RFSoC(pr.Device):
@@ -24,12 +23,8 @@ class RFSoC(pr.Device):
             # expand       = True,
         ))
 
-        self.add(xil.RfDataConverter(
-            offset       = 0x9000_0000,
-            # expand       = True,
-        ))
-
         self.add(rfsoc.Application(
-            offset       = 0xA000_0000,
-            expand       = True,
+            offset  = 0xA000_0000,
+            expand  = True,
+            enabled = False, # Do not configure until after LMK/LMX is up
         ))

@@ -32,21 +32,25 @@ entity SimpleRfSoc4x2Example is
       BUILD_INFO_G : BuildInfoType);
    port (
       -- System Ports
-      userLed : out slv(3 downto 0);
+      userLed   : out slv(3 downto 0);
       -- RF DATA CONVERTER Ports
-      adcClkP : in  slv(1 downto 0);
-      adcClkN : in  slv(1 downto 0);
-      adcP    : in  slv(3 downto 0);
-      adcN    : in  slv(3 downto 0);
-      dacClkP : in  slv(1 downto 0);
-      dacClkN : in  slv(1 downto 0);
-      dacP    : out slv(1 downto 0);
-      dacN    : out slv(1 downto 0);
-      sysRefP : in  sl;
-      sysRefN : in  sl;
+      adcClkP   : in  slv(1 downto 0);
+      adcClkN   : in  slv(1 downto 0);
+      adcP      : in  slv(7 downto 0);
+      adcN      : in  slv(7 downto 0);
+      dacClkP   : in  slv(1 downto 0);
+      dacClkN   : in  slv(1 downto 0);
+      dacP      : out slv(7 downto 0);
+      dacN      : out slv(7 downto 0);
+      sysRefP   : in  sl;
+      sysRefN   : in  sl;
+      plClkP    : in  sl;
+      plClkN    : in  sl;
+      plSysRefP : in  sl;
+      plSysRefN : in  sl;
       -- SYSMON Ports
-      vPIn    : in  sl;
-      vNIn    : in  sl);
+      vPIn      : in  sl;
+      vNIn      : in  sl);
 end SimpleRfSoc4x2Example;
 
 architecture top_level of SimpleRfSoc4x2Example is
@@ -190,6 +194,10 @@ begin
          dacN            => dacN,
          sysRefP         => sysRefP,
          sysRefN         => sysRefN,
+         plClkP          => plClkP,
+         plClkN          => plClkN,
+         plSysRefP       => plSysRefP,
+         plSysRefN       => plSysRefN,
          -- ADC/DAC Interface (dspClk domain)
          dspClk          => dspClk,
          dspRst          => dspRst,
