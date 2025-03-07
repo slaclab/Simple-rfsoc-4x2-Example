@@ -78,20 +78,19 @@ class Root(pr.Root):
             memBase    = self.memMap,
         ))
 
-        # Added the RFSoC device
-        self.add(rfsoc.RFSoC(
-            memBase    = self.memMap,
-            offset     = 0x04_0000_0000, # Full 40-bit address space
-            expand     = True,
-        ))
-
         # Add the RFDC API interface to the RFSoC PS
         self.memRfdc = rogue.interfaces.memory.TcpClient(ip,9002)
         self.add(rfsoc_utility.Rfdc(
             memBase   = self.memRfdc,
             enAdcTile = [True,False,True,False],
             enDacTile = [True,False,True,False],
-            expand    = True,
+        ))
+
+        # Added the RFSoC device
+        self.add(rfsoc.RFSoC(
+            memBase    = self.memMap,
+            offset     = 0x04_0000_0000, # Full 40-bit address space
+            expand     = True,
         ))
 
         ##################################################################################
@@ -152,8 +151,8 @@ class Root(pr.Root):
         self.Rfdc.Mst.AdcRefTile.set(0x2)
         self.Rfdc.Mst.DacRefTile.set(0x2)
         self.Rfdc.Mst.SysRefConfig.set(1)
-        # self.Rfdc.Mst.SyncAdcTiles()
-        # self.Rfdc.Mst.SyncDacTiles()
+        self.Rfdc.Mst.SyncAdcTiles()
+        self.Rfdc.Mst.SyncDacTiles()
 
         # Load the Default YAML file
         print(f'Loading path={self.defaultFile} Default Configuration File...')

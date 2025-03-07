@@ -108,7 +108,6 @@ sudo umount boot
 1) Using "scp" to copy your .bit file to the SD memory card on the RFSoC.  Here's an example:
 
 ```bash
-ssh-keygen -f "$HOME/.ssh/known_hosts" -R "10.0.0.10" # https://jira.slac.stanford.edu/browse/ESRFOC-54
 scp SimpleRfSoc4x2Example-0x01000000-20220204204648-ruckman-90df89c.bit root@10.0.0.10:/boot/system.bit
 ```
 
