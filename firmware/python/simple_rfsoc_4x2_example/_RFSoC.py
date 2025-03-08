@@ -11,7 +11,6 @@
 import pyrogue as pr
 
 import axi_soc_ultra_plus_core  as socCore
-import surf.xilinx              as xil
 import simple_rfsoc_4x2_example as rfsoc
 
 class RFSoC(pr.Device):
@@ -19,17 +18,13 @@ class RFSoC(pr.Device):
         super().__init__(**kwargs)
 
         self.add(socCore.AxiSocCore(
-            offset       = 0x0000_0000,
-            numDmaLanes  = 2,
-            # expand       = True,
-        ))
-
-        self.add(xil.RfDataConverter(
-            offset       = 0x9000_0000,
-            # expand       = True,
+            offset      = 0x0000_0000,
+            numDmaLanes = 2,
+            # expand      = True,
         ))
 
         self.add(rfsoc.Application(
-            offset       = 0xA000_0000,
-            expand       = True,
+            offset  = 0xA000_0000,
+            expand  = True,
+            enabled = False, # Do not configure until after DSP clock stable
         ))
