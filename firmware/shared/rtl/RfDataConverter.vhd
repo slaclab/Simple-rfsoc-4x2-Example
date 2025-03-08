@@ -68,18 +68,18 @@ architecture mapping of RfDataConverter is
 
    component RfDataConverterIpCore
       port (
+         adc0_clk_p      : in  std_logic;
+         adc0_clk_n      : in  std_logic;
          clk_adc0        : out std_logic;
-         clk_adc1        : out std_logic;
          adc2_clk_p      : in  std_logic;
          adc2_clk_n      : in  std_logic;
          clk_adc2        : out std_logic;
-         clk_adc3        : out std_logic;
+         dac0_clk_p      : in  std_logic;
+         dac0_clk_n      : in  std_logic;
          clk_dac0        : out std_logic;
-         clk_dac1        : out std_logic;
          dac2_clk_p      : in  std_logic;
          dac2_clk_n      : in  std_logic;
          clk_dac2        : out std_logic;
-         clk_dac3        : out std_logic;
          s_axi_aclk      : in  std_logic;
          s_axi_aresetn   : in  std_logic;
          s_axi_awaddr    : in  std_logic_vector(17 downto 0);
@@ -108,22 +108,14 @@ architecture mapping of RfDataConverter is
          vin0_01_n       : in  std_logic;
          vin0_23_p       : in  std_logic;
          vin0_23_n       : in  std_logic;
-         vin1_01_p       : in  std_logic;
-         vin1_01_n       : in  std_logic;
          vin2_01_p       : in  std_logic;
          vin2_01_n       : in  std_logic;
          vin2_23_p       : in  std_logic;
          vin2_23_n       : in  std_logic;
-         vin3_01_p       : in  std_logic;
-         vin3_01_n       : in  std_logic;
          vout00_p        : out std_logic;
          vout00_n        : out std_logic;
-         vout10_p        : out std_logic;
-         vout10_n        : out std_logic;
          vout20_p        : out std_logic;
          vout20_n        : out std_logic;
-         vout30_p        : out std_logic;
-         vout30_n        : out std_logic;
          m0_axis_aresetn : in  std_logic;
          m0_axis_aclk    : in  std_logic;
          m00_axis_tdata  : out std_logic_vector(191 downto 0);
@@ -132,11 +124,6 @@ architecture mapping of RfDataConverter is
          m02_axis_tdata  : out std_logic_vector(191 downto 0);
          m02_axis_tvalid : out std_logic;
          m02_axis_tready : in  std_logic;
-         m1_axis_aresetn : in  std_logic;
-         m1_axis_aclk    : in  std_logic;
-         m10_axis_tdata  : out std_logic_vector(191 downto 0);
-         m10_axis_tvalid : out std_logic;
-         m10_axis_tready : in  std_logic;
          m2_axis_aresetn : in  std_logic;
          m2_axis_aclk    : in  std_logic;
          m20_axis_tdata  : out std_logic_vector(191 downto 0);
@@ -145,31 +132,16 @@ architecture mapping of RfDataConverter is
          m22_axis_tdata  : out std_logic_vector(191 downto 0);
          m22_axis_tvalid : out std_logic;
          m22_axis_tready : in  std_logic;
-         m3_axis_aresetn : in  std_logic;
-         m3_axis_aclk    : in  std_logic;
-         m30_axis_tdata  : out std_logic_vector(191 downto 0);
-         m30_axis_tvalid : out std_logic;
-         m30_axis_tready : in  std_logic;
          s0_axis_aresetn : in  std_logic;
          s0_axis_aclk    : in  std_logic;
          s00_axis_tdata  : in  std_logic_vector(255 downto 0);
          s00_axis_tvalid : in  std_logic;
          s00_axis_tready : out std_logic;
-         s1_axis_aresetn : in  std_logic;
-         s1_axis_aclk    : in  std_logic;
-         s10_axis_tdata  : in  std_logic_vector(255 downto 0);
-         s10_axis_tvalid : in  std_logic;
-         s10_axis_tready : out std_logic;
          s2_axis_aresetn : in  std_logic;
          s2_axis_aclk    : in  std_logic;
          s20_axis_tdata  : in  std_logic_vector(255 downto 0);
          s20_axis_tvalid : in  std_logic;
-         s20_axis_tready : out std_logic;
-         s3_axis_aresetn : in  std_logic;
-         s3_axis_aclk    : in  std_logic;
-         s30_axis_tdata  : in  std_logic_vector(255 downto 0);
-         s30_axis_tvalid : in  std_logic;
-         s30_axis_tready : out std_logic
+         s20_axis_tready : out std_logic
          );
    end component;
 
@@ -222,8 +194,12 @@ begin
    U_IpCore : RfDataConverterIpCore
       port map (
          -- Clock Ports
+         adc0_clk_p      => adcClkP(0),
+         adc0_clk_n      => adcClkN(0),
          adc2_clk_p      => adcClkP(1),
          adc2_clk_n      => adcClkN(1),
+         dac0_clk_p      => dacClkP(0),
+         dac0_clk_n      => dacClkN(0),
          dac2_clk_p      => dacClkP(1),
          dac2_clk_n      => dacClkN(1),
          -- AXI-Lite Ports
@@ -256,23 +232,15 @@ begin
          vin0_01_n       => adcN(0),
          vin0_23_p       => adcP(1),
          vin0_23_n       => adcN(1),
-         vin1_01_p       => adcP(2),
-         vin1_01_n       => adcN(2),
-         vin2_01_p       => adcP(4),
-         vin2_01_n       => adcN(4),
-         vin2_23_p       => adcP(5),
-         vin2_23_n       => adcN(5),
-         vin3_01_p       => adcP(6),
-         vin3_01_n       => adcN(6),
+         vin2_01_p       => adcP(2),
+         vin2_01_n       => adcN(2),
+         vin2_23_p       => adcP(3),
+         vin2_23_n       => adcN(3),
          -- DAC Ports
          vout00_p        => dacP(0),
          vout00_n        => dacN(0),
-         vout10_p        => dacP(1),
-         vout10_n        => dacN(1),
-         vout20_p        => dacP(2),
-         vout20_n        => dacN(2),
-         vout30_p        => dacP(3),
-         vout30_n        => dacN(3),
+         vout20_p        => dacP(1),
+         vout20_n        => dacN(1),
          -----------------------------------------
          -- Reserve Order to match PCB silkscreen:
          -----------------------------------------
@@ -289,12 +257,6 @@ begin
          m02_axis_tdata  => adcRaw(2),
          m02_axis_tvalid => open,
          m02_axis_tready => '1',
-         -- Unused TILE but needed for CLK source from TILE228 distribution (ADC_VIN_TILE225)
-         m1_axis_aresetn => adcResetL,
-         m1_axis_aclk    => adcClock,
-         m10_axis_tdata  => open,
-         m10_axis_tvalid => open,
-         m10_axis_tready => '1',
          -- ADC[3:2] AXI Stream Interface (ADC_VIN_TILE226)
          m2_axis_aresetn => adcResetL,
          m2_axis_aclk    => adcClock,
@@ -304,12 +266,6 @@ begin
          m22_axis_tdata  => adcRaw(0),
          m22_axis_tvalid => open,
          m22_axis_tready => '1',
-         -- Unused TILE but needed for CLK source from TILE228 distribution (ADC_VIN_TILE227)
-         m3_axis_aresetn => adcResetL,
-         m3_axis_aclk    => adcClock,
-         m30_axis_tdata  => open,
-         m30_axis_tvalid => open,
-         m30_axis_tready => '1',
          -----------------------------------------
          -- Reserve Order to match PCB silkscreen:
          -----------------------------------------
@@ -322,24 +278,12 @@ begin
          s00_axis_tdata  => dspDac(1),
          s00_axis_tvalid => '1',
          s00_axis_tready => open,
-         -- Unused TILE but needed for CLK source from TILE228 distribution
-         s1_axis_aresetn => dacResetL,
-         s1_axis_aclk    => dacClock,
-         s10_axis_tdata  => (others => '0'),
-         s10_axis_tvalid => '1',
-         s10_axis_tready => open,
          -- DAC[1] AXI Stream Interface  (DAC_VOUT_TILE230)
          s2_axis_aresetn => dacResetL,
          s2_axis_aclk    => dacClock,
          s20_axis_tdata  => dspDac(0),
          s20_axis_tvalid => '1',
-         s20_axis_tready => open,
-         -- Unused TILE but needed for CLK source from TILE231 distribution
-         s3_axis_aresetn => dacResetL,
-         s3_axis_aclk    => dacClock,
-         s30_axis_tdata  => (others => '0'),
-         s30_axis_tvalid => '1',
-         s30_axis_tready => open);
+         s20_axis_tready => open);
 
    U_IBUFDS : IBUFDS
       port map(
