@@ -78,7 +78,7 @@ class Root(pr.Root):
             memBase    = self.memMap,
         ))
 
-        # Add the RFDC API interface to the RFSoC PS
+        # Add the RFDC API interface
         self.memRfdc = rogue.interfaces.memory.TcpClient(ip,9002)
         self.add(rfsoc_utility.Rfdc(
             memBase = self.memRfdc,
@@ -136,7 +136,7 @@ class Root(pr.Root):
         print('Wait for DSP Clock to be stable')
         self.RFSoC.AxiSocCore.DspRstWait()
 
-        # Enable application after LMK/LMX has been configured
+        # Enable application after DSP clock stable has been configured
         self.RFSoC.Application.enable.set(True)
         self.ReadAll()
 

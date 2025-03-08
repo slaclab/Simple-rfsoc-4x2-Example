@@ -18,13 +18,13 @@ class RFSoC(pr.Device):
         super().__init__(**kwargs)
 
         self.add(socCore.AxiSocCore(
-            offset       = 0x0000_0000,
-            numDmaLanes  = 2,
-            # expand       = True,
+            offset      = 0x0000_0000,
+            numDmaLanes = 2,
+            # expand      = True,
         ))
 
         self.add(rfsoc.Application(
             offset  = 0xA000_0000,
             expand  = True,
-            enabled = False, # Do not configure until after LMK/LMX is up
+            enabled = False, # Do not configure until after DSP clock stable
         ))
