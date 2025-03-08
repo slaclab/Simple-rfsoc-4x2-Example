@@ -81,9 +81,7 @@ class Root(pr.Root):
         # Add the RFDC API interface to the RFSoC PS
         self.memRfdc = rogue.interfaces.memory.TcpClient(ip,9002)
         self.add(rfsoc_utility.Rfdc(
-            memBase   = self.memRfdc,
-            enAdcTile = [True,False,True,False],
-            enDacTile = [True,False,True,False],
+            memBase = self.memRfdc,
         ))
 
         # Added the RFSoC device
