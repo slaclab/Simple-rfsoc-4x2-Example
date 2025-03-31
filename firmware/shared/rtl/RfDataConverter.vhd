@@ -151,7 +151,7 @@ architecture mapping of RfDataConverter is
    signal adcRaw  : Slv192Array(3 downto 0) := (others => (others => '0'));
    signal adcData : Slv192Array(3 downto 0) := (others => (others => '0'));
 
-   signal dacRaw : Slv256Array(1 downto 0); := (others => (others => '0'));
+   signal dacRaw : Slv256Array(1 downto 0) := (others => (others => '0'));
 
    signal adcClock  : sl := '0';
    signal adcReset  : sl := '1';
