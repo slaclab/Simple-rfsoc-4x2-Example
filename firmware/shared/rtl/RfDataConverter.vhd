@@ -151,6 +151,8 @@ architecture mapping of RfDataConverter is
    signal adcRaw  : Slv192Array(3 downto 0) := (others => (others => '0'));
    signal adcData : Slv192Array(3 downto 0) := (others => (others => '0'));
 
+   signal dacRaw : Slv256Array(1 downto 0); := (others => (others => '0'));
+
    signal adcClock  : sl := '0';
    signal adcReset  : sl := '1';
    signal adcResetL : sl := '0';
@@ -275,13 +277,13 @@ begin
          -- DAC[0] AXI Stream Interface (DAC_VOUT_TILE228)
          s0_axis_aresetn => dacResetL,
          s0_axis_aclk    => dacClock,
-         s00_axis_tdata  => dspDac(1),
+         s00_axis_tdata  => dacRaw(1),
          s00_axis_tvalid => '1',
          s00_axis_tready => open,
          -- DAC[1] AXI Stream Interface  (DAC_VOUT_TILE230)
          s2_axis_aresetn => dacResetL,
          s2_axis_aclk    => dacClock,
-         s20_axis_tdata  => dspDac(0),
+         s20_axis_tdata  => dacRaw(0),
          s20_axis_tvalid => '1',
          s20_axis_tready => open);
 
@@ -327,18 +329,21 @@ begin
    dacClock <= dspClock;
    dacReset <= dspReset;
 
-   ----------------------------------------------------------------
+   ------------------------------------------------------------------------
    -- Correct for a _P/_N swap on the RFSoC 4x2 hardware on TILE224
-   ----------------------------------------------------------------
-   -- ADC_A = CH[0] = ADC_VIN_I23_226
-   -- ADC_B = CH[1] = ADC_VIN_I01_226
-   -- ADC_C = CH[2] = ADC_VIN_I23_224 (swapped in HW)
-   -- ADC_D = CH[3] = ADC_VIN_I01_224 (swapped in HW)
-   ----------------------------------------------------------------
-   adcData(0) <= adcRaw(0);
-   adcData(1) <= adcRaw(1);
-   adcData(2) <= not adcRaw(2);
-   adcData(3) <= not adcRaw(3);
+   -- In addition,the balun is creating a signal polarity because
+   --       - _P connected to MABA-011118.pin5 (and not MABA-011118.pin6)
+   --       - _N connected to MABA-011118.pin6 (and not MABA-011118.pin5)
+   ------------------------------------------------------------------------
+   -- ADC_A = CH[0] = ADC_VIN_I23_226 (inverted in balun)
+   -- ADC_B = CH[1] = ADC_VIN_I01_226 (inverted in balun)
+   -- ADC_C = CH[2] = ADC_VIN_I23_224 (swapped in HW but inverted in balun)
+   -- ADC_D = CH[3] = ADC_VIN_I01_224 (swapped in HW but inverted in balun)
+   ------------------------------------------------------------------------
+   adcData(0) <= not adcRaw(0);
+   adcData(1) <= not adcRaw(1);
+   adcData(2) <= adcRaw(2);
+   adcData(3) <= adcRaw(3);
 
    U_Gearbox : entity axi_soc_ultra_plus_core.Ssr12ToSsr16Gearbox
       generic map (
@@ -352,5 +357,13 @@ begin
          rdClk  => dspClock,
          rdRst  => dspReset,
          rdData => dspAdc);
+
+   ----------------------------------------------------------------------
+   -- The balun is creating a signal polarity because
+   --       - _P connected to MABA-011118.pin5 (and not MABA-011118.pin6)
+   --       - _N connected to MABA-011118.pin6 (and not MABA-011118.pin5)
+   ----------------------------------------------------------------------
+   dacRaw(0) <= not dspDac(0);
+   dacRaw(1) <= not dspDac(1);
 
 end mapping;
