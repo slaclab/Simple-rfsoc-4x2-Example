@@ -119,9 +119,9 @@ ssh root@10.0.0.10 '/bin/sync; /sbin/reboot'
 
 <!--- ######################################################## -->
 
-# How to install the Rogue With Anaconda
+# How to install the Rogue With miniforge
 
-> https://slaclab.github.io/rogue/installing/anaconda.html
+> https://slaclab.github.io/rogue/installing/miniforge.html
 
 <!--- ######################################################## -->
 
@@ -129,7 +129,7 @@ ssh root@10.0.0.10 '/bin/sync; /sbin/reboot'
 
 - Assumes the DHCP assigned IP address is 10.0.0.10
 
-1) Setup the rogue environment (if on SLAC AFS network) else install rogue (recommend Anaconda method) on your local machine
+1) Setup the rogue environment (if on SLAC AFS network) else install rogue (recommend miniforge method) on your local machine
 
 ```bash
 $ source Simple-rfsoc-4x2-Example/software/setup_env_slac.sh
