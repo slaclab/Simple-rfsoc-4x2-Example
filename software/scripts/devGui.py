@@ -16,6 +16,7 @@ import sys
 import argparse
 import importlib
 import rogue
+import pyrogue
 import axi_soc_ultra_plus_core.rfsoc_utility.pydm
 
 if __name__ == "__main__":
