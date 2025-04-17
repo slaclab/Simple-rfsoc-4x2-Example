@@ -61,6 +61,14 @@ if __name__ == "__main__":
         help     = "Sets the default YAML configuration file to be loaded at the root.start()",
     )
 
+    parser.add_argument(
+        "--guiType",
+        type     = str,
+        required = False,
+        default  = 'PyDM',
+        help     = "Sets the GUI type (PyDM or None)",
+    )
+
     # Get the arguments
     args = parser.parse_args()
 
@@ -72,12 +80,31 @@ if __name__ == "__main__":
         initRead    = args.initRead,
         defaultFile = args.defaultFile,
     ) as root:
-        axi_soc_ultra_plus_core.rfsoc_utility.pydm.runPyDM(
-            serverList = root.zmqServer.address,
-            ui       = f'{os.path.dirname(axi_soc_ultra_plus_core.rfsoc_utility.__file__)}/gui/GuiTop.py',
-            sizeX    = 800,
-            sizeY    = 800,
-            numAdcCh = 4,
-            numDacCh = 2,
-        )
+
+        ######################
+        # Development PyDM GUI
+        ######################
+        if (args.guiType == 'PyDM'):
+            axi_soc_ultra_plus_core.rfsoc_utility.pydm.runPyDM(
+                serverList = root.zmqServer.address,
+                ui       = f'{os.path.dirname(axi_soc_ultra_plus_core.rfsoc_utility.__file__)}/gui/GuiTop.py',
+                sizeX    = 800,
+                sizeY    = 800,
+                numAdcCh = 4,
+                numDacCh = 2,
+            )
+
+        #################
+        # No GUI
+        #################
+        elif (args.guiType == 'None'):
+            print("Running without GUI...")
+            pyrogue.waitCntrlC()
+
+        ####################
+        # Undefined GUI type
+        ####################
+        else:
+            raise ValueError("Invalid GUI type (%s)" % (args.guiType) )
+
     #################################################################

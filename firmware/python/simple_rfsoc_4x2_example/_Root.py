@@ -35,14 +35,14 @@ class Root(pr.Root):
             defaultFile = '',
             lmkConfig   = 'config/lmk/HexRegisterValues.txt',
             lmxConfig   = 'config/lmx/HexRegisterValues.txt',
-            zmqSrvEn = True,  # Flag to include the ZMQ server
+            zmqSrvPort  = 9099, # Set to zero if dynamic (instead of static)
             **kwargs):
         super().__init__(timeout=5.0,**kwargs)
 
         #################################################################
-        if zmqSrvEn:
-            self.zmqServer = pyrogue.interfaces.ZmqServer(root=self, addr='127.0.0.1', port=0)
-            self.addInterface(self.zmqServer)
+
+        self.zmqServer = pyrogue.interfaces.ZmqServer(root=self, addr='127.0.0.1', port=zmqSrvPort)
+        self.addInterface(self.zmqServer)
 
         #################################################################
 
