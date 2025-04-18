@@ -58,7 +58,7 @@ class Root(pr.Root):
             self.lmxConfig   = lmxConfig
 
         # File writer
-        self.dataWriter = pr.utilities.fileio.StreamWriter()
+        self.dataWriter = pr.utilities.fileio.StreamWriter(name='DataWriter')
         self.add(self.dataWriter)
 
         ##################################################################################
