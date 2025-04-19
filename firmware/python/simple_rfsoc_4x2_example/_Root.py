@@ -102,21 +102,21 @@ class Root(pr.Root):
         else:
             self.ringBufferAdc = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', i+0,  True) for i in range(4)]
             self.ringBufferDac = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', 16+i, True) for i in range(2)]
-        self.adcRateDrop   = [stream.RateDrop(True,1.0) for i in range(4)]
-        self.dacRateDrop   = [stream.RateDrop(True,1.0) for i in range(2)]
+        self.adcDropFifo   = [pr.interfaces.stream.Fifo(name=f'AdcDropFifo[{i}]', maxDepth=1) for i in range(4)] # Drop if more than 1 frame in FIFO
+        self.dacDropFifo   = [pr.interfaces.stream.Fifo(name=f'DacDropFifo[{i}]', maxDepth=1) for i in range(2)] # Drop if more than 1 frame in FIFO
         self.adcProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'AdcProcessor[{i}]',sampleRate=5.0E+9) for i in range(4)]
         self.dacProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'DacProcessor[{i}]',sampleRate=5.0E+9) for i in range(2)]
 
         # Connect the rogue stream arrays: ADC Ring Buffer Path
         for i in range(4):
             self.ringBufferAdc[i] >> self.dataWriter.getChannel(i+0)
-            self.ringBufferAdc[i] >> self.adcRateDrop[i] >> self.adcProcessor[i]
+            self.ringBufferAdc[i] >> self.adcDropFifo[i] >> self.adcProcessor[i]
             self.add(self.adcProcessor[i])
 
         # Connect the rogue stream arrays: DAC Ring Buffer Path
         for i in range(2):
             self.ringBufferDac[i] >> self.dataWriter.getChannel(i+16)
-            self.ringBufferDac[i] >> self.dacRateDrop[i] >> self.dacProcessor[i]
+            self.ringBufferDac[i] >> self.dacDropFifo[i] >> self.dacProcessor[i]
             self.add(self.dacProcessor[i])
 
     ##################################################################################
