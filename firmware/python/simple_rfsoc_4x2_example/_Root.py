@@ -144,13 +144,13 @@ class Root(pr.Root):
         self.Rfdc.Init()
 
         # MTS Sync the RF Data Converter
-        self.Rfdc.Mst.AdcTiles.set(0x5)
-        self.Rfdc.Mst.DacTiles.set(0x5)
-        self.Rfdc.Mst.AdcRefTile.set(0x2)
-        self.Rfdc.Mst.DacRefTile.set(0x2)
-        self.Rfdc.Mst.SysRefConfig.set(1)
-        self.Rfdc.Mst.SyncAdcTiles()
-        self.Rfdc.Mst.SyncDacTiles()
+        self.Rfdc.Mts.AdcTiles.set(0x5)
+        self.Rfdc.Mts.DacTiles.set(0x5)
+        self.Rfdc.Mts.AdcRefTile.set(0x2)
+        self.Rfdc.Mts.DacRefTile.set(0x2)
+        self.Rfdc.Mts.SysRefConfig.set(1)
+        self.Rfdc.Mts.SyncAdcTiles()
+        self.Rfdc.Mts.SyncDacTiles()
 
         # Load the Default YAML file
         print(f'Loading path={self.defaultFile} Default Configuration File...')
