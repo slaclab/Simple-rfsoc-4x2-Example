@@ -10,24 +10,11 @@
 
 GitBase: ..
 
-TopRoguePackage: simple_rfsoc_4x2_example
-
-RoguePackages:
-  - submodules/surf/python
-  - submodules/axi-soc-ultra-plus-core/python
-  - python     
-
-# RogueConfig:
-  # - ../software/config
-
-# RogueScripts:
-  # - ../software/scripts/devGui
-
 Targets:
   SimpleRfSoc4x2Example:
     ImageDir: targets/SimpleRfSoc4x2Example/images
     Extensions:
-      - petalinux.tar.gz
+      - linux.tar.gz
 
 Releases:
   all:
@@ -35,4 +22,4 @@ Releases:
     Targets:
       - SimpleRfSoc4x2Example
     Types:
-      - Petalinux_Only
+      - Yocto

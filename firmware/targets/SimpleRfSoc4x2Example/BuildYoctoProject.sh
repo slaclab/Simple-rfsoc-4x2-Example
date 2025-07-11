@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ####################################################
 
 # Define the hardware type
@@ -22,7 +22,7 @@ buffSize=0x10000 # 64kB
 
 if [ $# -ne 1 ]
 then
-   echo "Usage: CreatePetalinuxProject.sh xsa"
+   echo "Usage: BuildYoctoProject.sh xsa"
    exit;
 fi
 
@@ -37,10 +37,10 @@ basePath=$(realpath "$PWD/../..")
 
 # Make the build output
 mkdir -p $basePath/build
-mkdir -p $basePath/build/petalinux
-buildPath=$basePath/build/petalinux
+mkdir -p $basePath/build/YoctoProjects
+buildPath=$basePath/build/YoctoProjects
 
-# Execute the create petalinux script
-../../submodules/axi-soc-ultra-plus-core/CreatePetalinuxProject.sh \
+# Execute the common build Yocto project script
+../../submodules/axi-soc-ultra-plus-core/BuildYoctoProject.sh \
 -p $buildPath -n $targetName -x $xsaPath -h $hwType \
 -l $numLane -d $numDest -t $txBuffCnt -r $rxBuffCnt -s $buffSize

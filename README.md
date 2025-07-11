@@ -42,29 +42,28 @@ $ ls -lath SimpleRfSoc4x2Example/images/
 total 47M
 drwxr-xr-x 5 ruckman re 2.0K Feb  7 07:13 ..
 drwxr-xr-x 2 ruckman re 2.0K Feb  4 21:15 .
--rw-r--r-- 1 ruckman re  14M Feb  4 21:15 SimpleRfSoc4x2Example-0x01000000-20220204204648-ruckman-90df89c.xsa
--rw-r--r-- 1 ruckman re  33M Feb  4 21:14 SimpleRfSoc4x2Example-0x01000000-20220204204648-ruckman-90df89c.bit
+-rw-r--r-- 1 ruckman re  14M Feb  4 21:15 SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.xsa
+-rw-r--r-- 1 ruckman re  33M Feb  4 21:14 SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.bit
 ```
 
 <!--- ######################################################## -->
 
-# How to build Petalinux images
+# How to build Yocto Linux images
 
 1) Generate the .bit and .xsa files (refer to `How to generate the RFSoC .BIT and .XSA files` instructions).
 
-2) Setup Xilinx licensing and petalinux software (if on SLAC AFS network) else requires Xilinx & petalinux install on your local machine
+2) Setup Xilinx PATH and licensing (if on SLAC AFS network) else requires Vivado install and licensing on your local machine
 
 ```bash
 # These setup scripts assume that you are on SLAC network
 $ source Simple-rfsoc-4x2-Example/firmware/vivado_setup.sh
-$ source /path/to/petalinux/2024.2/settings.sh
 ```
 
-3) Go to the target directory and run the `CreatePetalinuxProject.sh` script with arg pointing to path of .XSA file:
+3) Go to the target directory and run the `BuildYoctoProject.sh` script with arg pointing to path of .XSA file:
 
 ```bash
 $ cd Simple-rfsoc-4x2-Example/firmware/targets/SimpleRfSoc4x2Example/
-$ source CreatePetalinuxProject.sh images/SimpleRfSoc4x2Example-0x01000000-20220204204648-ruckman-90df89c.xsa
+$ source BuildYoctoProject.sh images/SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.xsa
 ```
 
 <!--- ######################################################## -->
@@ -83,10 +82,10 @@ Note: Assumes SD memory FAT32 is `/dev/sde1` in instructions below
 ```bash
 sudo mkdir -p boot
 sudo mount /dev/sde1 boot
-sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/system.bit boot/.
-sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/BOOT.BIN   boot/.
-sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/image.ub   boot/.
-sudo cp Simple-rfsoc-4x2-Example/firmware/build/petalinux/SimpleRfSoc4x2Example/images/linux/boot.scr   boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/YoctoProjects/SimpleRfSoc4x2Example/images/linux/system.bit boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/YoctoProjects/SimpleRfSoc4x2Example/images/linux/BOOT.BIN   boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/YoctoProjects/SimpleRfSoc4x2Example/images/linux/image.ub   boot/.
+sudo cp Simple-rfsoc-4x2-Example/firmware/build/YoctoProjects/SimpleRfSoc4x2Example/images/linux/boot.scr   boot/.
 sudo sync boot/
 sudo umount boot
 ```
@@ -108,7 +107,7 @@ sudo umount boot
 1) Using "scp" to copy your .bit file to the SD memory card on the RFSoC.  Here's an example:
 
 ```bash
-scp SimpleRfSoc4x2Example-0x01000000-20220204204648-ruckman-90df89c.bit root@10.0.0.10:/boot/system.bit
+scp SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.bit root@10.0.0.10:/boot/system.bit
 ```
 
 2) Send a "sync" and "reboot" command to the RFSoC to load new firmware:  Here's an example:
