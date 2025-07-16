@@ -23,7 +23,7 @@ buffSize=0x10000 # 64kB
 if [ $# -ne 1 ]
 then
    echo "Usage: BuildYoctoProject.sh xsa"
-   exit;
+   return 1
 fi
 
 # Define the target name
