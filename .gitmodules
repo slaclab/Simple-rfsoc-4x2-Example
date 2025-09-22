@@ -1,12 +1,12 @@
 [submodule "firmware/submodules/ruckus"]
 	path = firmware/submodules/ruckus
-	url = https://github.com/slaclab/ruckus.git
+	url = ../ruckus.git
 [submodule "firmware/submodules/surf"]
 	path = firmware/submodules/surf
-	url = https://github.com/slaclab/surf.git
+	url = ../surf.git
 [submodule "firmware/submodules/aes-stream-drivers"]
 	path = firmware/submodules/aes-stream-drivers
-	url = https://github.com/slaclab/aes-stream-drivers.git
+	url = ../aes-stream-drivers.git
 [submodule "firmware/submodules/axi-soc-ultra-plus-core"]
 	path = firmware/submodules/axi-soc-ultra-plus-core
-	url = https://github.com/slaclab/axi-soc-ultra-plus-core.git
+	url = ../axi-soc-ultra-plus-core.git
