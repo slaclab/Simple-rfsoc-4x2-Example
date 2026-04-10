@@ -65,13 +65,11 @@ class Root(pr.Root):
         ##                              Register Access
         ##################################################################################
 
-        if ip != None:
-            # Check if we can ping the device and TCP socket not open
-            soc_core.connectionTest(ip)
-            # Start a TCP Bridge Client, Connect remote server at 'ethReg' ports 9000 & 9001.
-            self.memMap = rogue.interfaces.memory.TcpClient(ip,9000)
-        else:
-            self.memMap = rogue.hardware.axi.AxiMemMap('/dev/axi_memory_map')
+        # Check if we can ping the device and TCP socket not open
+        soc_core.connectionTest(ip)
+
+        # Start a TCP Bridge Client, Connect remote server at 'ethReg' ports 9000 & 9001.
+        self.memMap = rogue.interfaces.memory.TcpClient(ip,9000)
 
         # Add RfSoC4x2 PS hardware control
         self.add(rfsoc_hw.Hardware(
@@ -96,14 +94,12 @@ class Root(pr.Root):
         ##################################################################################
 
         # Create rogue stream arrays
-        if ip != None:
-            self.ringBufferAdc = [stream.TcpClient(ip,10000+2*(i+0))  for i in range(4)]
-            self.ringBufferDac = [stream.TcpClient(ip,10000+2*(i+16)) for i in range(2)]
-        else:
-            self.ringBufferAdc = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', i+0,  True) for i in range(4)]
-            self.ringBufferDac = [rogue.hardware.axi.AxiStreamDma('/dev/axi_stream_dma_0', 16+i, True) for i in range(2)]
+        self.ringBufferAdc = [stream.TcpClient(ip,10000+2*(i+0))  for i in range(4)]
+        self.ringBufferDac = [stream.TcpClient(ip,10000+2*(i+16)) for i in range(2)]
+
         self.adcDropFifo   = [pr.interfaces.stream.Fifo(name=f'AdcDropFifo[{i}]', maxDepth=1) for i in range(4)] # Drop if more than 1 frame in FIFO
         self.dacDropFifo   = [pr.interfaces.stream.Fifo(name=f'DacDropFifo[{i}]', maxDepth=1) for i in range(2)] # Drop if more than 1 frame in FIFO
+
         self.adcProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'AdcProcessor[{i}]',sampleRate=5.0E+9) for i in range(4)]
         self.dacProcessor  = [rfsoc_utility.RingBufferProcessor(name=f'DacProcessor[{i}]',sampleRate=5.0E+9) for i in range(2)]
 
@@ -118,6 +114,18 @@ class Root(pr.Root):
             self.ringBufferDac[i] >> self.dataWriter.getChannel(i+16)
             self.ringBufferDac[i] >> self.dacDropFifo[i] >> self.dacProcessor[i]
             self.add(self.dacProcessor[i])
+
+    ##################################################################################
+
+        # DMA[lane=2][TDEST=0] = ports 11024 & 11025
+        self.xvcStream = stream.TcpClient(ip,11024)
+
+        # Create (Xilinx Virtual Cable) XVC on localhost
+        self.xvc = rogue.protocols.xilinx.Xvc( 2542 )
+        self.addProtocol( self.xvc )
+
+        # Connect DMA[lane=2][TDEST=0] to XVC
+        self.xvcStream == self.xvc
 
     ##################################################################################
 

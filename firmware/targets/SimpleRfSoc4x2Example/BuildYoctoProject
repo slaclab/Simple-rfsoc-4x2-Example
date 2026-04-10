@@ -7,7 +7,7 @@ set -e
 hwType=RealDigitalRfSoC4x2
 
 # Define number of DMA lanes
-numLane=2
+numLane=3
 
 # Define number of DEST per DMA lane
 numDest=32

@@ -1,6 +1,9 @@
 # Define target output
 target: bit
 
+# Using XVC Debug bridge
+export USE_XVC_DEBUG = 1
+
 # Define target part
 export PRJ_PART = xczu48dr-ffvg1517-2-e
 

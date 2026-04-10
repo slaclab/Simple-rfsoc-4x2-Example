@@ -8,6 +8,8 @@
 ## the terms contained in the LICENSE.txt file.
 ##############################################################################
 
+set_clock_groups -asynchronous -group [get_clocks -of_objects [get_pins U_XVC_PLL/MmcmGen.U_Mmcm/CLKOUT0]] -group [get_clocks -of_objects [get_pins U_Core/REAL_CPU.U_CPU/U_Pll/PllGen.U_Pll/CLKOUT0]]
+
 create_clock -name plClkP -period  2.0 [get_ports {plClkP}]
 
 set_clock_groups -asynchronous \

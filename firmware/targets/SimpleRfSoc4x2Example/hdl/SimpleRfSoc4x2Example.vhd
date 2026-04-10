@@ -88,12 +88,38 @@ architecture top_level of SimpleRfSoc4x2Example is
    signal dspAdc : Slv256Array(3 downto 0);
    signal dspDac : Slv256Array(1 downto 0);
 
+   signal xvcClk156 : sl;
+   signal xvcRst156 : sl;
+
 begin
 
    userLed(0) <= not(axilRst);
    userLed(1) <= not(dmaRst);
    userLed(2) <= not(dspRst);
    userLed(3) <= '1';
+
+   U_XVC_PLL : entity surf.ClockManagerUltraScale
+      generic map(
+         TPD_G              => TPD_G,
+         TYPE_G             => "MMCM",
+         INPUT_BUFG_G       => true,
+         FB_BUFG_G          => true,
+         RST_IN_POLARITY_G  => '1',
+         NUM_CLOCKS_G       => 1,
+         -- MMCM attributes
+         BANDWIDTH_G        => "OPTIMIZED",
+         CLKIN_PERIOD_G     => 10.0,    -- 100MHz
+         DIVCLK_DIVIDE_G    => 8,       -- 12.5MHz = 100MHz/8
+         CLKFBOUT_MULT_F_G  => 96.875,  -- 1210.9375MHz = 96.875 x 12.5MHz
+         CLKOUT0_DIVIDE_F_G => 7.75)    -- 156.25MHz = 1210.9375MHz/7.75
+      port map(
+         -- Clock Input
+         clkIn     => axilClk,
+         rstIn     => axilRst,
+         -- Clock Outputs
+         clkOut(0) => xvcClk156,
+         -- Reset Outputs
+         rstOut(0) => xvcRst156);
 
    -----------------------
    -- Common Platform Core
@@ -221,5 +247,24 @@ begin
    ----------------------
    dmaIbMasters(1) <= dmaObMasters(1);
    dmaObSlaves(1)  <= dmaIbSlaves(1);
+
+   -------------
+   -- XVC Module
+   -------------
+   U_XVC : entity surf.DmaXvcWrapper
+      generic map (
+         TPD_G             => TPD_G,
+         DMA_AXIS_CONFIG_G => DMA_AXIS_CONFIG_C)
+      port map (
+         -- 156.25MHz XVC Clock/Reset (xvcClk156 domain)
+         xvcClk156   => xvcClk156,
+         xvcRst156   => xvcRst156,
+         -- DMA Interface (dmaClk domain)
+         dmaClk      => dmaClk,
+         dmaRst      => dmaRst,
+         dmaObMaster => dmaObMasters(2),
+         dmaObSlave  => dmaObSlaves(2),
+         dmaIbMaster => dmaIbMasters(2),
+         dmaIbSlave  => dmaIbSlaves(2));
 
 end top_level;

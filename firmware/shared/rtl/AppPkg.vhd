@@ -27,8 +27,9 @@ package AppPkg is
    -------------------------------------------------
    -- DMA[lane=0].inbound  = ADC/DAC ring buffers
    -- DMA[lane=1]          = loopback debugging
+   -- DMA[lane=2]          = XVC path
    -------------------------------------------------
-   constant DMA_SIZE_C : positive := 2;
+   constant DMA_SIZE_C : positive := 3;
 
    constant AXIL_CLK_FREQ_C   : real := 100.0E+6;               -- Units of Hz
    constant AXIL_CLK_PERIOD_C : real := (1.0/AXIL_CLK_FREQ_C);  -- Units of seconds
