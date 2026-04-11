@@ -20,6 +20,7 @@ import pyrogue as pr
 import pyrogue.protocols
 import pyrogue.utilities.fileio
 import pyrogue.utilities.prbs
+import pyrogue.interfaces.stream
 
 import simple_rfsoc_4x2_example              as rfsoc
 import axi_soc_ultra_plus_core.rfsoc_utility as rfsoc_utility
