@@ -52,7 +52,7 @@ drwxr-xr-x 2 ruckman re 2.0K Feb  4 21:15 .
 
 1) Generate the .bit and .xsa files (refer to `How to generate the RFSoC .BIT and .XSA files` instructions).
 
-2) Setup Xilinx PATH and licensing (if on SLAC AFS network) else requires Vivado install and licensing on your local machine
+2) Setup Xilinx PATH and licensing (if on SLAC AFS network) else requires Vivado install and licensing on your local machine.
 
 ```bash
 # These setup scripts assume that you are on SLAC network
@@ -70,25 +70,27 @@ $ source build_docker.sh
 $ source run_docker.sh
 ```
 
-4) Go to the target directory and run the `BuildYoctoProject.sh` script with arg pointing to path of .XSA file:
+4) Go to the target directory and run the `BuildYoctoProject.sh` script with arg pointing to path of .XSA file.
+For a clean build the `-c` option can be passed to the build script.
 
 ```bash
 $ cd Simple-rfsoc-4x2-Example/firmware/targets/SimpleRfSoc4x2Example/
-$ source BuildYoctoProject.sh images/SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.xsa
+$ source BuildYoctoProject.sh -f images/SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.xsa
 ```
 
 <!--- ######################################################## -->
 
 # How to make the SD memory card for the first time
 
-1) Creating Two Partitions.  Refer to URL below
+## The manual way
 
+1) Creating Two Partitions. Refer to for example the instructions here:
 https://xilinx-wiki.atlassian.net/wiki/x/EYMfAQ
 
-2) Copy For the boot images, simply copy the files to the FAT partition.
-This typically will include system.bit, BOOT.BIN, image.ub, and boot.scr.  Here's an example:
+2) For the boot images, simply copy the files to the FAT partition.
+This typically will include `system.bit`, `BOOT.BIN`, `image.ub`, and `boot.scr`.  Here's an example:
 
-Note: Assumes SD memory FAT32 is `/dev/sde1` in instructions below
+Note: Assumes SD memory FAT32 is `/dev/sde1` in instructions below.
 
 ```bash
 sudo mkdir -p boot
@@ -109,6 +111,22 @@ sudo umount boot
 
 6) Confirm that you can ping the boot after it boots up
 
+One may connect to the serial console for troubleshooting if say the network
+does not work. Speed should be 115200 baud. Use your favorite serial client.
+On Linux you may use `cu` like this:
+```bash
+cu --line /dev/ttyUSB1 --speed 115200 --parity=none
+```
+Multiple USB devices may appear when connecting to the serial to USB bridge on
+the board. One of those should be the serial console.
+
+## Using image generation script
+One can use `firmware/submodules/axi-soc-ultra-plus-core/scripts/CreateDiskImage.sh`. Use as
+```bash
+source CreateDiskImage.sh path_to_image_file.img images/SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.linux.tar.gz
+```
+The second argument is the packaged build results file produced by the Yocto build.
+
 <!--- ######################################################## -->
 
 # How to remote update the firmware bitstream
@@ -126,6 +144,16 @@ scp SimpleRfSoc4x2Example-0x03000000-20250710093359-ruckman-XXXXXXX.bit root@10.
 ```bash
 ssh root@10.0.0.10 '/bin/sync; /sbin/reboot'
 ```
+
+The `sync` command is important as writing to the SD-Card is slow and rebooting
+before the write has completed may corrupt the written file. `sync` waits until
+all writes have completed. This may take a few seconds.
+
+It is also possible to update the Linux system running on the CPU remotely as
+the filesystem used during runtime is in memory and thus decoupled from the
+files on the SD-Card. The SD card is mounted at `/boot/`.
+Thus one can update any of the files in `/boot/` remotely, call `sync` to
+ensure write and the `reboot` the system remotely.
 
 <!--- ######################################################## -->
 
