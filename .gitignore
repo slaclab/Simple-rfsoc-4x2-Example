@@ -38,6 +38,8 @@ build*
 docs/_build/
 # Exception: documentation files whose names start with "build"
 !docs/**/build_*.rst
+# Exception: docker build script
+!dockers/yocto/build_*.sh
 images*
 bin*
 .Xil*
