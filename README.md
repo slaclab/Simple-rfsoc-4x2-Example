@@ -59,7 +59,18 @@ drwxr-xr-x 2 ruckman re 2.0K Feb  4 21:15 .
 $ source Simple-rfsoc-4x2-Example/firmware/vivado_setup.sh
 ```
 
-3) Go to the target directory and run the `BuildYoctoProject.sh` script with arg pointing to path of .XSA file:
+3) (Optional) The build can be run in a Docker container (Ubuntu 22). The container comes with all required packages for the build.
+Note that the launch script exposes the users home directory to the container.
+
+```bash
+# Build the docker container (only required once)
+$ cd Simple-rfsoc-4x2-Example/dockers/yocto
+$ source build_docker.sh
+# Launch the container (drops into shell inside the container)
+$ source run_docker.sh
+```
+
+4) Go to the target directory and run the `BuildYoctoProject.sh` script with arg pointing to path of .XSA file:
 
 ```bash
 $ cd Simple-rfsoc-4x2-Example/firmware/targets/SimpleRfSoc4x2Example/
