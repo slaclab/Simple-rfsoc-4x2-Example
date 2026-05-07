@@ -18,6 +18,7 @@ import rogue.interfaces.memory
 
 import pyrogue as pr
 import pyrogue.protocols
+import pyrogue.interfaces.stream
 import pyrogue.utilities.fileio
 import pyrogue.utilities.prbs
 
