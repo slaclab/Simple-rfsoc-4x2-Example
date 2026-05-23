@@ -70,3 +70,6 @@ slprj*
 .planning/
 planning/
 CLAUDE.md
+
+# Docs build venv (path-based conda env)
+.venv-docs/
