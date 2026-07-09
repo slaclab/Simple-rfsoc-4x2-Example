@@ -12,3 +12,4 @@ below for the canonical procedure; this page is intentionally a pointer.
 * :hub:`XSCT boot mode <how-to/xsct_boot_mode.html>`
 * :hub:`QSPI flash <how-to/qspi_flash.html>`
 * :hub:`SD card imaging <how-to/sd_card_imaging.html>`
+* :hub:`TFTP network boot <how-to/tftp_network_boot.html>`
