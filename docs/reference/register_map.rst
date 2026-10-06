@@ -80,11 +80,11 @@ Sample bus dimensions
 
 The RFDC and Application exchange samples over a 256-bit parallel bus carrying
 16 samples per ``dspClk`` cycle. The bus width is fixed by the
-:doc:`app_pkg` constant ``SAMPLE_PER_CYCLE_C = 16``; the sample width is 16-bit
-signed integer per channel.
+:doc:`app_pkg` constant ``SAMPLE_PER_CYCLE_C = 16``; each sample is a 16-bit
+signed integer.
 
-* ADC bus: ``dspAdc : Slv256Array(3 downto 0)`` — 4 channels.
-* DAC bus: ``dspDac : Slv256Array(1 downto 0)`` — 2 channels.
+* ADC bus: ``dspAdc : Slv256Array(3 downto 0)`` (4 channels).
+* DAC bus: ``dspDac : Slv256Array(1 downto 0)`` (2 channels).
 
 For the platform-level ``Slv256Array`` type definition (declared in
 ``surf.StdRtlPkg``) and the broader sample-bus convention used across SLAC

@@ -65,7 +65,7 @@ Clock domains
      - 416.667 MHz
      - RFDC ADC output.
 
-All cross-domain crossings use surf ``Synchronizer`` or ``Ssr12ToSsr16Gearbox``
+All clock-domain crossings use surf ``Synchronizer`` or ``Ssr12ToSsr16Gearbox``
 primitives; the three domains are declared as asynchronous groups in the XDC.
 For the platform-level CDC philosophy, see
 :hub:`explanation/architecture.html#clock-domains`.
